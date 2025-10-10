@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MayApp - Letra R</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Definición de la paleta de colores en CSS para usar en JS y como utilidad */
+        :root {
+            --color-maroon: #9F2241;
+            --color-khaki: #BCA986;
+            --color-green: #235B4E;
+            --color-gray: #888B8D;
+            --color-text-primary: #1F2937; /* Darker text for readability */
+        }
+        
+        /* Configuración de Tailwind para usar las variables de color */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'maya-maroon': 'var(--color-maroon)',
+                        'maya-khaki': 'var(--color-khaki)',
+                        'maya-green': 'var(--color-green)',
+                        'maya-gray': 'var(--color-gray)',
+                        'text-primary': 'var(--color-text-primary)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+
+        /* Estilo base para asegurar que la fuente Inter se aplique */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        /* Estilos del encabezado */
+        .header-bg {
+            background-color: var(--color-maroon);
+        }
+        .header-text {
+            color: var(--color-khaki);
+        }
+
+        /* Estilo para la palabra en español (clickable) */
+        .spanish-word {
+            color: var(--color-green);
+            cursor: pointer; /* Indica que es clickeable */
+            transition: color 0.2s ease-in-out;
+        }
+        .spanish-word:hover {
+            color: #1A473C; /* Un verde un poco más oscuro al pasar el ratón */
+        }
+
+        /* CLASE PARA LA DEFINICIÓN OCULTA */
+        .maya-definition {
+            max-height: 0; /* Inicialmente oculto */
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        /* CLASE PARA LA DEFINICIÓN VISIBLE */
+        .maya-definition.visible {
+            max-height: 100px; /* Suficientemente grande para contener la definición */
+            opacity: 1;
+            margin-top: 0.5rem; /* Pequeño margen superior al mostrar */
+        }
+        
+        /* Estilo para el separador o borde de los elementos */
+        .card-divider {
+            border-bottom: 1px solid var(--color-gray);
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- Encabezado Fijo -->
+    <header class="header-bg shadow-lg sticky top-0 z-10 rounded-b-xl">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="header-text text-xl sm:text-2xl font-bold tracking-wider">
+                MayApp - Diccionario maya
+            </h1>
+            <span class="bg-maya-khaki text-maya-maroon px-3 py-1 text-sm font-semibold rounded-full shadow-md">
+                Letra R
+            </span>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal de la Lista -->
+    <main class="max-w-4xl mx-auto p-4 pt-8">
+        <div id="dictionary-list" class="space-y-4">
+            <!-- Las tarjetas del diccionario se renderizarán aquí -->
+            <div class="text-center p-8 text-maya-gray">Cargando palabras...</div>
+        </div>
+    </main>
+
+    <!-- Pie de página discreto -->
+    <footer class="mt-12 py-4 bg-gray-100 text-center text-xs text-maya-gray border-t border-maya-gray/30">
+        <p>Proyecto de Lengua y Cultura Maya. Haz clic en la palabra en español para ver la traducción.</p>
+    </footer>
+
+    <script>
+        // Datos del diccionario actualizados del documento 'A [actualizado].docx', corregidos hasta AZUZAR.
+        // Formato: { spanish: "Palabra Española", maya: "DEFINICIÓN EN MAYA" }
+        const DICTIONARY_DATA = [
+            
+		{ spanish: "Rabadilla", maya: "Bobox." },
+		{ spanish: "Rabia", maya: "Ko’, ko’il." },
+		{ spanish: "Rabo", maya: "Nej." },
+		{ spanish: "Racimo", maya: "Ch’úuy, p’óoch." },
+		{ spanish: "Ración", maya: "O’och." },
+		{ spanish: "Radicar", maya: "Kajtal, kuxtal." },
+		{ spanish: "Raer", maya: "Jo’och, joro’ox." },
+		{ spanish: "Raíz", maya: "Moots." },
+		{ spanish: "Raja", maya: "Xéet’, xóot’, búuj, ts’íit." },
+		{ spanish: "Rajar", maya: "Buuj, teej, jaat, xiik." },
+		{ spanish: "Rama", maya: "K’ab, k’ab che’, jéek’, xay che’; xa’ay che’." },
+		{ spanish: "Ramera", maya: "(x)Káakbach, (x)chek’a’an peel, (x)choko iit." },
+		{ spanish: "Ramo", maya: "Jéek’." },
+		{ spanish: "Ramón", maya: "Oox." },
+		{ spanish: "Rana", maya: "Muuch." },
+		{ spanish: "Rapar", maya: "Ts’iik, k’oos, k’oliskun, noroch k’oos, norot’ k’oos." },
+		{ spanish: "Rápido, a", maya: "Séeb, séeb, séeba’an, chich jach chich." },
+		{ spanish: "Raptar", maya: "Ookol, biis." },
+		{ spanish: "Raquítico, a", maya: "P’eex, ts’uuts’." },
+		{ spanish: "Raro, a", maya: "Jela’an." },
+		{ spanish: "Rascar", maya: "Joot’, la’ach, leep’." },
+		{ spanish: "Rasgar", maya: "La’ach, le’ep’." },
+		{ spanish: "Rasguñar", maya: "La’ach, jo’ot, xe’ep’." },
+		{ spanish: "Raspar", maya: "Jo’och, ja’ach." },
+		{ spanish: "Rasurar", maya: "Ts’iik." },
+		{ spanish: "Rata", maya: "Ch’o’." },
+		{ spanish: "Rato", maya: "Súutuk." },
+		{ spanish: "Ratón", maya: "Ch’o’." },
+		{ spanish: "Raudo, a", maya: "Séeb." },
+		{ spanish: "Raya", maya: "(-hecha con alguna punta) jaat’." },
+		{ spanish: "Rayar", maya: "Jaat’, jara’at’" },
+		{ spanish: "Rayo", maya: "Jaats’ cháak, (-de sol) Juul k’iin." },
+		{ spanish: "Raza", maya: "Ch’i’ibal." },
+		{ spanish: "Razón", maya: "Na’at, tuukul." },
+		{ spanish: "Razonar", maya: "Tuukul, na’at." },
+		{ spanish: "Realizar", maya: "Beet, meent." },
+		{ spanish: "Rebajar", maya: "Chichankun, mejenkun, éens." },
+		{ spanish: "Rebanar", maya: "K’uup, jáat k’uup." },
+		{ spanish: "Rebelión", maya: "Líik’il, líik’ ba’ate’el." },
+		{ spanish: "Rebosar", maya: "Tuul." },
+		{ spanish: "Rebozo", maya: "Bóoch’" },
+		{ spanish: "Rebusca", maya: "Meents’ul, kaxan." },
+		{ spanish: "Rebuscar", maya: "Meents’ul, kaxan." },
+		{ spanish: "Recado", maya: "Túux t’aan, túuxbil t’aan (especias) xa’ak’." },
+		{ spanish: "Recaudar", maya: "Mool, mool taak’in." },
+		{ spanish: "Recelar", maya: "Sajaktal, péek óol, k’ux óol." },
+		{ spanish: "Recelo", maya: "Péek óol, k’ux óol." },
+		{ spanish: "Recibir", maya: "K’aam, ch’a’." },
+		{ spanish: "Recio, a", maya: "K’a’am." },
+		{ spanish: "Recluir", maya: "K’aal" },
+		{ spanish: "Recoger", maya: "Mool, jáaymol." },
+		{ spanish: "Recompensar", maya: "Bo’ol." },
+		{ spanish: "Reconocer", maya: "K’ajóol." },
+		{ spanish: "Recordar", maya: "K’a’ajal, k’a’ajs." },
+		{ spanish: "Recostar", maya: "Naak, nakkun." },
+		{ spanish: "Rectificar", maya: "Utskin." },
+		{ spanish: "Recto, a", maya: "Taats’, toj." },
+		{ spanish: "Recular", maya: "Kukul iit." },
+		{ spanish: "Recuperar", maya: "Ch’a’ óol, utstal, ch’a’ muuk’." },
+		{ spanish: "Rechazar", maya: "Ma’ óota’aj, ma’ u k’a’amaj ba’al." },
+		{ spanish: "Red", maya: "K’áan." },
+		{ spanish: "Redactar", maya: "Ts’íib." },
+		{ spanish: "Redimir", maya: "Loj." },
+		{ spanish: "Redondo, a", maya: "Wóolis, wolis." },
+		{ spanish: "Reducir", maya: "Chichantal, chichankun, mejenkun." },
+		{ spanish: "Reflexionar", maya: "Tuukul." },
+		{ spanish: "Refrigerador", maya: "Un’ukul ku síiskuntik ba’alo’ob." },
+		{ spanish: "Regalar", maya: "Síij" },
+		{ spanish: "Regalo", maya: "Síij, máatan." },
+		{ spanish: "Regañar", maya: "K’eey, k’eeyal." },
+		{ spanish: "Regaño", maya: "K’eey, k’eeyaj" },
+		{ spanish: "Regar", maya: "Jóoyab, jóoya’." },
+		{ spanish: "Registrar", maya: "Ts’íib" },
+		{ spanish: "Regla", maya: "P’isib." },
+		{ spanish: "Regresar", maya: "Suut, taal." },
+		{ spanish: "Reír", maya: "Che’ej." },
+		{ spanish: "Reja", maya: "Jool bej." },
+		{ spanish: "Relación", maya: "(-sexual) Ts’iis, naach’." },
+		{ spanish: "Relámpago", maya: "Lejem cháak." },
+		{ spanish: "Relatar", maya: "Tsikbal, tsool, a’al." },
+		{ spanish: "Relinchar", maya: "Awat tsíimin." },
+		{ spanish: "Remar", maya: "Báab yéetel che’." },
+		{ spanish: "Remediar", maya: "Utskin." },
+		{ spanish: "Remendar", maya: "Pak’a kook, utskin." },
+		{ spanish: "Remitir", maya: "Túux, túuchi’." },
+		{ spanish: "Remo", maya: "Che’ yéetel ku yáantkuba máak utia’al u bin ich ja’ yéetel u cheem." },
+		{ spanish: "Remojar", maya: "Ts’aam, suul." },
+		{ spanish: "Remolino", maya: "Moson." },
+		{ spanish: "Remozar", maya: "Utskin, túumbenkun." },
+		{ spanish: "Remuneración", maya: "Bo’ol." },
+		{ spanish: "Renacuajo", maya: "Mejen muuch, chan muuch." },
+		{ spanish: "Rencor", maya: "K’uux, ch’a’ k’uux." },
+		{ spanish: "Renegar", maya: "Pooch’, pooch’il, k’ex óol." },
+		{ spanish: "Rentar", maya: "Majan." },
+		{ spanish: "Renuevo", maya: "K’u’uk’, top’ che’, óol." },
+		{ spanish: "Renunciar", maya: "P’aat." },
+		{ spanish: "Reñir", maya: "Ba’ate’el." },
+		{ spanish: "Reparar", maya: "Utskin." },
+		{ spanish: "Repartir", maya: "T’oox." },
+		{ spanish: "Repetir", maya: "U ka’ meenta’al wáa ba’ax." },
+		{ spanish: "Reposar", maya: "Je’elel, wa’atal, ch’a’ iik’." },
+		{ spanish: "Reposo", maya: "Je’elel, wa’atal, ch’a’ iik." },
+		{ spanish: "Reproducir", maya: "Ka’ meent." },
+		{ spanish: "Reptar", maya: "Jiil, jiilankal," },
+		{ spanish: "Reptil", maya: "Tuláakal ba’alche’o’ob jilankil u máano’ob." },
+		{ spanish: "Repugnante", maya: "Che’ k’aas, táaj k’aas." },
+		{ spanish: "Res", maya: "Wakax." },
+		{ spanish: "Resbalar", maya: "Jaak, jaak, jakchajal, jalk’ajal, kipchajal, pitk’ajal." },
+		{ spanish: "Rescatar", maya: "K’eex, loj." },
+		{ spanish: "Rescate", maya: "K’eex." },
+		{ spanish: "Resembrar", maya: "Xaab, taab, julbe’en." },
+		{ spanish: "Resfriado, a", maya: "Síis óol, oka’an síis." },
+		{ spanish: "Resina", maya: "Iits." },
+		{ spanish: "Resistir", maya: "Ts’áaba chichi, ma’ tu p’atkuba." },
+		{ spanish: "Resollar", maya: "Jajak iik’." },
+		{ spanish: "Respetar", maya: "Chíin jo’ol, tsiik." },
+		{ spanish: "Respeto", maya: "Chíin jo’ol, tsiik." },
+		{ spanish: "Respiración", maya: "Ch’a’ iik’." },
+		{ spanish: "Respirar", maya: "Ch’a’iik’" },
+		{ spanish: "Resplandecer", maya: "Léembal, juul." },
+		{ spanish: "Resplandor", maya: "(de fuego) Léets’." },
+		{ spanish: "Responder", maya: "Núuk." },
+		{ spanish: "Responsabilidad", maya: "Kuuch." },
+		{ spanish: "Respuesta", maya: "Núuk." },
+		{ spanish: "Restar", maya: "Tseel, luk’s." },
+		{ spanish: "Restaurante", maya: "Naj tu’ux ku ko’onol janal." },
+		{ spanish: "Resto", maya: "Yala’, xiix." },
+		{ spanish: "Resucitar", maya: "Ka’ kuxtal, ka’síijil." },
+		{ spanish: "Resuello", maya: "Ch’a’ iik’." },
+		{ spanish: "Retar", maya: "Kax ba’ate’el, kaxan ba’ate’el." },
+		{ spanish: "Retazo", maya: "Xéet’, xóot’, yala’" },
+		{ spanish: "Retener", maya: "Ta’ak, k’aal." },
+		{ spanish: "Retentar", maya: "Léekel." },
+		{ spanish: "Retirar", maya: "Luk’s, luk’ul." },
+		{ spanish: "Retobado, a", maya: "K’o’ox." },
+		{ spanish: "Retoñar", maya: "K’u’uk’ankil." },
+		{ spanish: "Retoño", maya: "K’u’uk’, top’ che’." },
+		{ spanish: "Retornar", maya: "Suut." },
+		{ spanish: "Retorno", maya: "Suut." },
+		{ spanish: "Retortijón", maya: "Ch’oot; (-de tripas) ch’ot nak’." },
+		{ spanish: "Retozar", maya: "Síit’, pa’ muuk’, pompom síit’." },
+		{ spanish: "Retrato", maya: "Yoochel je’ ba’axake’." },
+		{ spanish: "Retroceder", maya: "Kukul iit." },
+		{ spanish: "Retumbar", maya: "Juum, áamba, líil." },
+		{ spanish: "Reunión", maya: "Much’tal, much’kinaj, mulkinaj." },
+		{ spanish: "Reunir", maya: "Much’kin, mulkin." },
+		{ spanish: "Revelar", maya: "E’es." },
+		{ spanish: "Reverdecer", maya: "Ya’axtal, áak’tal." },
+		{ spanish: "Revés", maya: "Paach, kúul pach." },
+		{ spanish: "Revisar", maya: "Il wáa ma’alob." },
+		{ spanish: "Revivir", maya: "Ka’ kuxtal, ka’ kuxkin." },
+		{ spanish: "Revolcar", maya: "Babal, jawlankil." },
+		{ spanish: "Revolotear", maya: "Popokxiik’, papalaankil." },
+		{ spanish: "Revoltillo", maya: "Xe’ek’." },
+		{ spanish: "Revoltura", maya: "Xa’ak, xe’ek’." },
+		{ spanish: "Revolver", maya: "Xa’ak, péeks, chíikt.." },
+		{ spanish: "Rezar", maya: "Payal chi’." },
+		{ spanish: "Ribera", maya: "Chi’, jáal." },
+		{ spanish: "Rico, a", maya: "Ayik’al; (de sabor) ki’." },
+		{ spanish: "Ridículo, a", maya: "Su’utsil, subtalil." },
+		{ spanish: "Riego", maya: "Jóoyab." },
+		{ spanish: "Riel", maya: "U beel wakax k’áak’." },
+		{ spanish: "Rienda", maya: "Jok’ ni’." },
+		{ spanish: "Rifle", maya: "Ts’oon." },
+		{ spanish: "Rincón", maya: "Tséel, tu’uk’." },
+		{ spanish: "Risa", maya: "Che’ej." },
+		{ spanish: "Rizar", maya: "Mulixkun, mulixkin." },
+		{ spanish: "Rizo, a", maya: "U mulixil u pool máak." },
+		{ spanish: "Robar", maya: "Ookol." },
+		{ spanish: "Roble", maya: "Béek." },
+		{ spanish: "Robo", maya: "Ookol." },
+		{ spanish: "Roca", maya: "Nojoch tuunich." },
+		{ spanish: "Rociar", maya: "Líil, tsiits, wits’ ja’," },
+		{ spanish: "Rocío", maya: "P’ija’, jats’al ja’." },
+		{ spanish: "Rodaja", maya: "Pe’et, me’et." },
+		{ spanish: "Rodar", maya: "Bajak’, balk’ajal." },
+		{ spanish: "Rodilla", maya: "Piix" },
+		{ spanish: "Roer", maya: "Nées, néet’, p’éep’." },
+		{ spanish: "Rogar", maya: "Yaayan k’áat." },
+		{ spanish: "Rojo, a", maya: "Chak." },
+		{ spanish: "Romper", maya: "Jaat, xeet’, xiik, pa’, kaach, t’aak." },
+		{ spanish: "Ron", maya: "Cho’ol, chool." },
+		{ spanish: "Roncar", maya: "Nóok’" },
+		{ spanish: "Ronco, a", maya: "Ma’as kaal, so’oj kaal." },
+		{ spanish: "Roncha", maya: "Siip’." },
+		{ spanish: "Rondar", maya: "Máan." },
+		{ spanish: "Ropa", maya: "Nook’, búuk." },
+		{ spanish: "Ropero", maya: "U kúuchil tu’ux ku ts’a’abal nook’." },
+		{ spanish: "Rosa", maya: "Nikte’." },
+		{ spanish: "Rosca", maya: "Koots’." },
+		{ spanish: "Rostro", maya: "Ich." },
+		{ spanish: "Roto, a", maya: "Jaatal, pa’al, xeet’el." },
+		{ spanish: "Rótula", maya: "Pool píix." },
+		{ spanish: "Roza", maya: "Kool, páak." },
+		{ spanish: "Rozar", maya: "Kool, páak." },
+		{ spanish: "Rubio, a", maya: "Ch’eel." },
+		{ spanish: "Rúbrica", maya: "Joron ts’íib." },
+		{ spanish: "Rudo, a", maya: "Máak chich u meentik wáa ba’ax." },
+		{ spanish: "Ruedo", maya: "U kúuchil u pa’ayal wakax." },
+		{ spanish: "Ruido", maya: "Juum." },
+		{ spanish: "Ruin", maya: "K’aas, k’aak’as máak." },
+		{ spanish: "Ruina", maya: "Lab pak’, (x)la’ pak’" },
+		{ spanish: "Ruiseñor", maya: "k’ook’, (x) k’ook’." },
+		{ spanish: "Rumiar", maya: "Jaach’, ka’ jaach’" },
+		{ spanish: "Rumor", maya: "Juum u tsikbalil wáa ba’ax." },
+		{ spanish: "Rústico, a", maya: "To’otol." },
+		{ spanish: "Ruta", maya: "Bej, beel, bejil." }
+        ];
+
+        // Función para capitalizar solo la primera letra.
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        }
+
+        // Función principal para renderizar la lista
+        function renderDictionary() {
+            const listContainer = document.getElementById('dictionary-list');
+            listContainer.innerHTML = ''; // Limpiar el mensaje de carga
+
+            DICTIONARY_DATA.forEach((item, index) => {
+                const spanishWord = capitalizeFirstLetter(item.spanish);
+
+                // 1. Creación de la tarjeta/elemento de definición
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 sm:p-5 rounded-xl shadow-lg hover:shadow-xl transition-shadow card-divider';
+                
+                // 2. Palabra en español (clickeable)
+                const spanishEl = document.createElement('h2');
+                // Añadimos un ID único para poder vincular la definición a este elemento.
+                spanishEl.id = `word-${index}`; 
+                spanishEl.className = 'spanish-word text-xl sm:text-2xl font-extrabold mb-1 select-none'; // select-none evita que el texto se seleccione al hacer clic
+                spanishEl.textContent = spanishWord;
+
+                // 3. Contenedor de la definición en maya (Inicialmente oculta)
+                const mayaContainer = document.createElement('div');
+                // Clase CSS para ocultar/mostrar con animación
+                mayaContainer.className = 'maya-definition'; 
+                mayaContainer.id = `definition-${index}`;
+
+                // 4. Contenido de la definición
+                const mayaEl = document.createElement('p');
+                mayaEl.className = 'text-base sm:text-lg text-text-primary leading-relaxed';
+                mayaEl.textContent = item.maya;
+                
+                // 5. Armar la definición dentro del contenedor
+                mayaContainer.appendChild(mayaEl);
+
+                // 6. Configurar el evento de click en la palabra en español
+                spanishEl.addEventListener('click', () => {
+                    // Alternar la clase 'visible' para mostrar u ocultar la definición
+                    mayaContainer.classList.toggle('visible');
+
+                    // Opcional: Ocultar todas las demás definiciones abiertas
+                    // document.querySelectorAll('.maya-definition.visible').forEach(def => {
+                    //     if (def.id !== mayaContainer.id) {
+                    //         def.classList.remove('visible');
+                    //     }
+                    // });
+                });
+
+                // 7. Armar la tarjeta completa
+                card.appendChild(spanishEl);
+                // El separador se moverá justo antes del contenido en maya visible
+                const divider = document.createElement('div');
+                divider.className = 'w-10 h-0.5 bg-maya-gray/50 mb-1 rounded-full';
+                
+                // Se coloca el separador dentro del contenedor oculto/visible para que aparezca con la definición.
+                mayaContainer.prepend(divider); 
+                
+                card.appendChild(mayaContainer);
+
+                listContainer.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDictionary);
+
+    </script>
+</body>
+</html>

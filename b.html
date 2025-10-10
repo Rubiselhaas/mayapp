@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MayApp - Letra B</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Definición de la paleta de colores en CSS para usar en JS y como utilidad */
+        :root {
+            --color-maroon: #9F2241;
+            --color-khaki: #BCA986;
+            --color-green: #235B4E;
+            --color-gray: #888B8D;
+            --color-text-primary: #1F2937; /* Darker text for readability */
+        }
+        
+        /* Configuración de Tailwind para usar las variables de color */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'maya-maroon': 'var(--color-maroon)',
+                        'maya-khaki': 'var(--color-khaki)',
+                        'maya-green': 'var(--color-green)',
+                        'maya-gray': 'var(--color-gray)',
+                        'text-primary': 'var(--color-text-primary)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+
+        /* Estilo base para asegurar que la fuente Inter se aplique */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        /* Estilos del encabezado */
+        .header-bg {
+            background-color: var(--color-maroon);
+        }
+        .header-text {
+            color: var(--color-khaki);
+        }
+
+        /* Estilo para la palabra en español (clickable) */
+        .spanish-word {
+            color: var(--color-green);
+            cursor: pointer; /* Indica que es clickeable */
+            transition: color 0.2s ease-in-out;
+        }
+        .spanish-word:hover {
+            color: #1A473C; /* Un verde un poco más oscuro al pasar el ratón */
+        }
+
+        /* CLASE PARA LA DEFINICIÓN OCULTA */
+        .maya-definition {
+            max-height: 0; /* Inicialmente oculto */
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        /* CLASE PARA LA DEFINICIÓN VISIBLE */
+        .maya-definition.visible {
+            max-height: 100px; /* Suficientemente grande para contener la definición */
+            opacity: 1;
+            margin-top: 0.5rem; /* Pequeño margen superior al mostrar */
+        }
+        
+        /* Estilo para el separador o borde de los elementos */
+        .card-divider {
+            border-bottom: 1px solid var(--color-gray);
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- Encabezado Fijo -->
+    <header class="header-bg shadow-lg sticky top-0 z-10 rounded-b-xl">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="header-text text-xl sm:text-2xl font-bold tracking-wider">
+                MayApp - Diccionario maya
+            </h1>
+            <span class="bg-maya-khaki text-maya-maroon px-3 py-1 text-sm font-semibold rounded-full shadow-md">
+                Letra B
+            </span>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal de la Lista -->
+    <main class="max-w-4xl mx-auto p-4 pt-8">
+        <div id="dictionary-list" class="space-y-4">
+            <!-- Las tarjetas del diccionario se renderizarán aquí -->
+            <div class="text-center p-8 text-maya-gray">Cargando palabras...</div>
+        </div>
+    </main>
+
+    <!-- Pie de página discreto -->
+    <footer class="mt-12 py-4 bg-gray-100 text-center text-xs text-maya-gray border-t border-maya-gray/30">
+        <p>Proyecto de Lengua y Cultura Maya. Haz clic en la palabra en español para ver la traducción.</p>
+    </footer>
+
+    <script>
+        // Datos del diccionario actualizados del documento 'A [actualizado].docx', corregidos hasta AZUZAR.
+        // Formato: { spanish: "Palabra Española", maya: "DEFINICIÓN EN MAYA" }
+        const DICTIONARY_DATA = [
+            
+            { spanish: "BABA", maya: "K’aabankil chi’, lúulankil." },
+            { spanish: "BABEAR", maya: "K’aabankil chi’, lúulankil." },
+            { spanish: "BABOSA", maya: "Iisíil, (x)iisíil." },
+            { spanish: "BABOSO", maya: "Máak jach ku choj u lúul, ku ya’ala’al xan ti’ máak mina’an u na’at." },
+            { spanish: "BACÍN", maya: "U kúuchil tu’ux ku kutal ta’ máak." },
+            { spanish: "BACINICA", maya: "Ch’eneb iit." },
+            { spanish: "BACHE", maya: "Jool." },
+            { spanish: "BAGAZO", maya: "(-de henequén) Ta’kij." },
+            { spanish: "BAGRE", maya: "Lu’, box kay." },
+            { spanish: "BAILADOR", maya: "(J)óok’ot, (x)óok’ot." },
+            { spanish: "BAILAR", maya: "Óok’ot." },
+            { spanish: "BAILE", maya: "Óok’ot." },
+            { spanish: "BAJAR", maya: "Éemel." },
+            { spanish: "BAJAREQUE", maya: "Kolóojche’, kolóoxche’." },
+            { spanish: "BAJO", maya: "Kaabal." },
+            { spanish: "BALA", maya: "Yóol ts’oon." },
+            { spanish: "BALANCEAR", maya: "Úumbal." },
+            { spanish: "BALDÍO", maya: "Xtokoy." },
+            { spanish: "BALIDO", maya: "U yawat taman." },
+            { spanish: "BALOMPIÉ", maya: "Báaxal kóocha’." },
+            { spanish: "BAMBOLEAR", maya: "Takchalak, chíikba." },
+            { spanish: "BANANO", maya: "Ja’as." },
+            { spanish: "BANDIDO", maya: "(J)ookol." },
+            { spanish: "BANQUILLO", maya: "K’áanche’." },
+            { spanish: "BAÑAR", maya: "Ichkíil, isíim" },
+            { spanish: "BAÑO", maya: "Ichkíil." },
+            { spanish: "BAR", maya: "Naj tu’ux ku ko’onol yéetel ku yu’uk’ul ba’ax ku káalkunsik máak." },
+            { spanish: "BARAJAR", maya: "Xa’ak, xa’ak’kun." },
+            { spanish: "BARATO", maya: "Ma’ ko’ojil." },
+            { spanish: "BARBA", maya: "Me’ex." },
+            { spanish: "BARBACOA", maya: "Píib." },
+            { spanish: "BARBERO", maya: "(J)k’oos." },
+            { spanish: "BARBILLA", maya: "No’och." },
+            { spanish: "BARCO", maya: "Cheem." },
+            { spanish: "BARDA", maya: "Koot." },
+            { spanish: "BARRENAR", maya: "Poot." },
+            { spanish: "BARRER", maya: "Míis." },
+            { spanish: "BARRIGA", maya: "Nak’." },
+            { spanish: "BARRIGÓN", maya: "P’uruxnak’" },
+            { spanish: "BARRIL", maya: "P’úul." },
+            { spanish: "BARRO", maya: "K’at." },
+            { spanish: "BÁSCULA", maya: "P’iisib." },
+            { spanish: "BASE", maya: "Chuun, chuun pak’, iit" },
+            { spanish: "BASILISCO", maya: "Tóolok" },
+            { spanish: "BASTANTE", maya: "Ya’ab." },
+            { spanish: "BASTÓN", maya: "Xóolte’." },
+            { spanish: "BASURA", maya: "Sojol." },
+            { spanish: "BASURERO", maya: "U nu’ukulil u ts’a’abal sojol wáa u kúuchil tu’ux ku pu’ulul." },
+            { spanish: "BATALLA", maya: "Ba’ate’il." },
+            { spanish: "BATALLAR", maya: "Ba’ate’el." },
+            { spanish: "BATE", maya: "Che’il jaats’" },
+            { spanish: "BATEA", maya: "U nu’ukul tu’ux ku yúuchul p’o’" },
+            { spanish: "BATEAR", maya: "Jaats’" },
+            { spanish: "BATIDA", maya: "(cacería) P’uuj." },
+            { spanish: "BATIR", maya: "Book’" },
+            { spanish: "BAUTISMO", maya: "Oka’, ok ja’." },
+            { spanish: "BAUTIZAR", maya: "Oka’, ok ja’." },
+            { spanish: "BAUTIZO", maya: "Oka’, ok ja’." },
+            { spanish: "BAZAR", maya: "Kúuchil u yúuchul koonol." },
+            { spanish: "BAZO", maya: "Yal peek’." },
+            { spanish: "BEBÉ", maya: "Chaanpal." },
+            { spanish: "BEBER", maya: "Uk’ul." },
+            { spanish: "BEBIDA", maya: "Uk’ul, uk’uj." },
+            { spanish: "BEJUCO", maya: "Aak’." },
+            { spanish: "BELLEZA", maya: "Ki’ichpanil, jats’utsil" },
+            { spanish: "BELLO", maya: "Jats’uts, ki’ichpan, ki’ichkelem." },
+            { spanish: "BENDECIR", maya: "Tsíits ja’." },
+            { spanish: "BENÉVOLO", maya: "Uuts, uts máak." },
+            { spanish: "BERMEJO", maya: "K’aan chak." },
+            { spanish: "BESAR", maya: "Ts’u’uts’." },
+            { spanish: "BESO", maya: "Ts’u’uts." },
+            { spanish: "BESTIA", maya: "Ba’alche." },
+            { spanish: "BIBLIOTECA", maya: "Kúuchil tu’ux ku ts’a’abal ya’akach xokbil ju’uno’ob." },
+            { spanish: "BÍCEPS", maya: "Muuk’ k’ab, muuk’il k’ab, miis k’ab." },
+            { spanish: "BICICLETA", maya: "T’íinchak’ jáanchak’ balak’ ook." },
+            { spanish: "BIEN", maya: "Ma’alob, uts." },
+            { spanish: "BIENESTAR", maya: "Ma’alob kuxtal." },
+            { spanish: "BIFURCACIÓN", maya: "Xa’ay." },
+            { spanish: "BIGOTE", maya: "Me’ex." },
+            { spanish: "BIKINI", maya: "Kul eex." },
+            { spanish: "BILINGÜE", maya: "Ka’ap’éel t’aan" },
+            { spanish: "BILIS", maya: "K’aaj, k’an chik’in." },
+            { spanish: "BILLETE", maya: "Ju’unil taak’in." },
+            { spanish: "BIOGRAFÍA", maya: "U ts’íibil u kuxtalil juntúul máak." },
+            { spanish: "BISTEC", maya: "Tsajbi bak’." },
+            { spanish: "BIZCO", maya: "Ts’eeb." },
+            { spanish: "BLANCO", maya: "Sak." },
+            { spanish: "BLANCURA", maya: "Sakil." },
+            { spanish: "BLANDO", maya: "O’olkij, bi’bi’ki." },
+            { spanish: "BLANQUEAR", maya: "Sakkun," },
+            { spanish: "BLANQUILLO", maya: "Je’, e’el." },
+            { spanish: "BLASFEMAR", maya: "Pooch’il." },
+            { spanish: "BLASFEMIA", maya: "Pooch’, pooch’il" },
+            { spanish: "BLOQUEAR", maya: "K’al bej, wa’akuns" },
+            { spanish: "BOA", maya: "Och kaan." },
+            { spanish: "BOBO", maya: "Jajap chi’, meejen keep." },
+            { spanish: "BOCA", maya: "Chi’" },
+            { spanish: "BOCADO", maya: "Níich." },
+            { spanish: "BOCANADA", maya: "P’u’uk." },
+            { spanish: "BOCHORNO", maya: "Ooxol, choko iik’" },
+            { spanish: "BODA", maya: "Ts’o’okol beel" },
+            { spanish: "BODEGA", maya: "U kúuchil wáa u najil tu’ux ku ta’aka’al ba’alo’ob." },
+            { spanish: "BOFE", maya: "Soorot’, sot’ot’." },
+            { spanish: "BOFETADA", maya: "Xiik laj." },
+            { spanish: "BOLA", maya: "Wóolis." },
+            { spanish: "BOLSA", maya: "Chíim, pawo’, sáabukan" },
+            { spanish: "BOLLO", maya: "Wool, wóolis." },
+            { spanish: "BOMBERO", maya: "(j) Tup k’áak’." },
+            { spanish: "BONANZA", maya: "Kukupkil." },
+            { spanish: "BONDAD", maya: "Utsil." },
+            { spanish: "BONETE", maya: "K’úumche’, k’úunche’." },
+            { spanish: "BONITO", maya: "Jats’uts, (m) ki’ichkelem, ki’ichkelen, (f)ki’ichpam, n." },
+            { spanish: "BOQUETE", maya: "Jool." },
+            { spanish: "BORDADO", maya: "Chuuy." },
+            { spanish: "BORDADOR", maya: "(J)chuuy, (x)chuuy." },
+            { spanish: "BORDAR", maya: "Chuuy." },
+            { spanish: "BORDE", maya: "Chi’ u xuul waa ba’ax." },
+            { spanish: "BORBOTAR", maya: "Popok’ look, pok’os look, lookankil." },
+            { spanish: "BOREAL", maya: "Xaman, ti’ xaman." },
+            { spanish: "BORRACHERA", maya: "Káaltal." },
+            { spanish: "BORRACHO", maya: "Kala’an" },
+            { spanish: "BORRAR", maya: "Tuup." },
+            { spanish: "BORRASCA", maya: "Cháak jach k’a’am yéetel u yiik’el." },
+            { spanish: "BORREGO", maya: "Taman." },
+            { spanish: "BOSQUE", maya: "k’áax, nukuch k’áax, ka’anal k’áax." },
+            { spanish: "BOSTEZAR", maya: "Jaayab." },
+            { spanish: "BOTAR", maya: "Puul, ch’iin, píik ch’iin" },
+            { spanish: "BOTICA", maya: "U najil wáa u kúuchil tu’ux ku meenta’al yéetel ku ko’onol ts’aako’ob." },
+            { spanish: "BOTICARIO", maya: "(J)Meen ts’aak, (j)kon ts’aak." },
+            { spanish: "BOTIJA", maya: "P’úl nu’ut’ yéetel wóolis." },
+            { spanish: "BOTIQUÍN", maya: "U nu’ukul u bisa’al wáa u li’isa’al ts’aak." },
+            { spanish: "BOTÓN", maya: "(-de flor) úuturis, úuntulis." },
+            { spanish: "BOVÉDA", maya: "Pak’ tu’ux ku mu’uku kimen." },
+            { spanish: "BOXEADOR", maya: "(J)loox." },
+            { spanish: "BOXEAR", maya: "Loox, loxbáaj." },
+            { spanish: "BOXEO", maya: "Loox." },
+            { spanish: "BOZAL", maya: "Jool ni’" },
+            { spanish: "BRAGUETA", maya: "Jool tu táan u nook’ xiib wáa xch’uup." },
+            { spanish: "BRAMA", maya: "U k’iini táan u báaxlaantkuba ba’alche’o’ob." },
+            { spanish: "BRAMAR", maya: "Awat, áakam." },
+            { spanish: "BRANQUIA", maya: "Bu’ul, úul." },
+            { spanish: "BRASA", maya: "Chúuk, náaxche’." },
+            { spanish: "BRAVO", maya: "Ts’íik." },
+            { spanish: "BRAZA", maya: "Sáap." },
+            { spanish: "BRAZO", maya: "K’ab." },
+            { spanish: "BRECHA", maya: "T’úut’ul bej." },
+            { spanish: "BREVE", maya: "Kóom, ma’ xaani’." },
+            { spanish: "BRIBÓN", maya: "K’aas, loob." },
+            { spanish: "BRILLANTE", maya: "Léembal, léets’bal" },
+            { spanish: "BRILLAR", maya: "Joop, léembal, léets’bal." },
+            { spanish: "BRILLO", maya: "Léembal, léets’bal." },
+            { spanish: "BRINCAR", maya: "Síit’, puul, p’iit." },
+            { spanish: "BRINCO", maya: "Síit’, puul, p’iit." },
+            { spanish: "BRINDAR", maya: "Uk’ul tu yóo’laj uláak’ máak." },
+            { spanish: "BRISA", maya: "Yik’al k’áak’náab." },
+            { spanish: "BROCADO", maya: "Chuuyil nook’ yéetel k’an taak’in." },
+            { spanish: "BROCAL", maya: "Chi’, chi’ ch’e’en." },
+            { spanish: "BROCHA", maya: "Chan míis ku meyajtia’al u bo’onol pak’" },
+            { spanish: "BROMEAR", maya: "Báaxal, p’a’as." },
+            { spanish: "BRONQUIO", maya: "Soorot’, sot’ot’." },
+            { spanish: "BROTAR", maya: "Tóop’, xíitil, jóok’ol, tóop’ol." },
+            { spanish: "BROTE", maya: "K’u’uk." },
+            { spanish: "BRUJO", maya: "(J) Wáay, wáay." },
+            { spanish: "BRUÑIR", maya: "Yúul." },
+            { spanish: "BRUTO", maya: "Ba’alche’, tsíimin" },
+            { spanish: "BUCHE", maya: "Tsuuk, chíim." },
+            { spanish: "BUDIN", maya: "Ch’ujuk meenta’an yéetel u xéexet’al ch’ujuk waaj." },
+            { spanish: "BUEN", maya: "Uts, ma’alob;ki’." },
+            { spanish: "BUHO", maya: "Tunkuruchu, kulte’." },
+            { spanish: "BULLA", maya: "Juum, ya’ab t’aan." },
+            { spanish: "BULLICIO", maya: "Juum, t’aan." },
+            { spanish: "BULLIR", maya: "Look, óomankil." },
+            { spanish: "BURBUJA", maya: "Óom." },
+            { spanish: "BURDEL", maya: "U najil tu’ux ku yúuchul ts’iis." },
+            { spanish: "BURDO", maya: "Poopox, tóotol." },
+            { spanish: "BURGUÉS", maya: "Ayik’al máak." },
+            { spanish: "BURLA", maya: "P’a’as." },
+            { spanish: "BURLAR", maya: "P’a’as." },
+            { spanish: "BUSCAR", maya: "Kaxan." },
+            { spanish: "BUZO", maya: "Mak ku meyaj tu taamil ja’ wáa ich k’aa’náab." }
+
+        ];
+
+        // Función para capitalizar solo la primera letra.
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        }
+
+        // Función principal para renderizar la lista
+        function renderDictionary() {
+            const listContainer = document.getElementById('dictionary-list');
+            listContainer.innerHTML = ''; // Limpiar el mensaje de carga
+
+            DICTIONARY_DATA.forEach((item, index) => {
+                const spanishWord = capitalizeFirstLetter(item.spanish);
+
+                // 1. Creación de la tarjeta/elemento de definición
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 sm:p-5 rounded-xl shadow-lg hover:shadow-xl transition-shadow card-divider';
+                
+                // 2. Palabra en español (clickeable)
+                const spanishEl = document.createElement('h2');
+                // Añadimos un ID único para poder vincular la definición a este elemento.
+                spanishEl.id = `word-${index}`; 
+                spanishEl.className = 'spanish-word text-xl sm:text-2xl font-extrabold mb-1 select-none'; // select-none evita que el texto se seleccione al hacer clic
+                spanishEl.textContent = spanishWord;
+
+                // 3. Contenedor de la definición en maya (Inicialmente oculta)
+                const mayaContainer = document.createElement('div');
+                // Clase CSS para ocultar/mostrar con animación
+                mayaContainer.className = 'maya-definition'; 
+                mayaContainer.id = `definition-${index}`;
+
+                // 4. Contenido de la definición
+                const mayaEl = document.createElement('p');
+                mayaEl.className = 'text-base sm:text-lg text-text-primary leading-relaxed';
+                mayaEl.textContent = item.maya;
+                
+                // 5. Armar la definición dentro del contenedor
+                mayaContainer.appendChild(mayaEl);
+
+                // 6. Configurar el evento de click en la palabra en español
+                spanishEl.addEventListener('click', () => {
+                    // Alternar la clase 'visible' para mostrar u ocultar la definición
+                    mayaContainer.classList.toggle('visible');
+
+                    // Opcional: Ocultar todas las demás definiciones abiertas
+                    // document.querySelectorAll('.maya-definition.visible').forEach(def => {
+                    //     if (def.id !== mayaContainer.id) {
+                    //         def.classList.remove('visible');
+                    //     }
+                    // });
+                });
+
+                // 7. Armar la tarjeta completa
+                card.appendChild(spanishEl);
+                // El separador se moverá justo antes del contenido en maya visible
+                const divider = document.createElement('div');
+                divider.className = 'w-10 h-0.5 bg-maya-gray/50 mb-1 rounded-full';
+                
+                // Se coloca el separador dentro del contenedor oculto/visible para que aparezca con la definición.
+                mayaContainer.prepend(divider); 
+                
+                card.appendChild(mayaContainer);
+
+                listContainer.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDictionary);
+
+    </script>
+</body>
+</html>

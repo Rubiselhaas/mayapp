@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MayApp - Letra P</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Definición de la paleta de colores en CSS para usar en JS y como utilidad */
+        :root {
+            --color-maroon: #9F2241;
+            --color-khaki: #BCA986;
+            --color-green: #235B4E;
+            --color-gray: #888B8D;
+            --color-text-primary: #1F2937; /* Darker text for readability */
+        }
+        
+        /* Configuración de Tailwind para usar las variables de color */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'maya-maroon': 'var(--color-maroon)',
+                        'maya-khaki': 'var(--color-khaki)',
+                        'maya-green': 'var(--color-green)',
+                        'maya-gray': 'var(--color-gray)',
+                        'text-primary': 'var(--color-text-primary)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+
+        /* Estilo base para asegurar que la fuente Inter se aplique */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        /* Estilos del encabezado */
+        .header-bg {
+            background-color: var(--color-maroon);
+        }
+        .header-text {
+            color: var(--color-khaki);
+        }
+
+        /* Estilo para la palabra en español (clickable) */
+        .spanish-word {
+            color: var(--color-green);
+            cursor: pointer; /* Indica que es clickeable */
+            transition: color 0.2s ease-in-out;
+        }
+        .spanish-word:hover {
+            color: #1A473C; /* Un verde un poco más oscuro al pasar el ratón */
+        }
+
+        /* CLASE PARA LA DEFINICIÓN OCULTA */
+        .maya-definition {
+            max-height: 0; /* Inicialmente oculto */
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        /* CLASE PARA LA DEFINICIÓN VISIBLE */
+        .maya-definition.visible {
+            max-height: 100px; /* Suficientemente grande para contener la definición */
+            opacity: 1;
+            margin-top: 0.5rem; /* Pequeño margen superior al mostrar */
+        }
+        
+        /* Estilo para el separador o borde de los elementos */
+        .card-divider {
+            border-bottom: 1px solid var(--color-gray);
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- Encabezado Fijo -->
+    <header class="header-bg shadow-lg sticky top-0 z-10 rounded-b-xl">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="header-text text-xl sm:text-2xl font-bold tracking-wider">
+                MayApp - Diccionario maya
+            </h1>
+            <span class="bg-maya-khaki text-maya-maroon px-3 py-1 text-sm font-semibold rounded-full shadow-md">
+                Letra P
+            </span>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal de la Lista -->
+    <main class="max-w-4xl mx-auto p-4 pt-8">
+        <div id="dictionary-list" class="space-y-4">
+            <!-- Las tarjetas del diccionario se renderizarán aquí -->
+            <div class="text-center p-8 text-maya-gray">Cargando palabras...</div>
+        </div>
+    </main>
+
+    <!-- Pie de página discreto -->
+    <footer class="mt-12 py-4 bg-gray-100 text-center text-xs text-maya-gray border-t border-maya-gray/30">
+        <p>Proyecto de Lengua y Cultura Maya. Haz clic en la palabra en español para ver la traducción.</p>
+    </footer>
+
+    <script>
+        // Datos del diccionario actualizados del documento 'A [actualizado].docx', corregidos hasta AZUZAR.
+        // Formato: { spanish: "Palabra Española", maya: "DEFINICIÓN EN MAYA" }
+        const DICTIONARY_DATA = [
+            
+		{ spanish: "Pabellón", maya: "Lakam, le’ xikin" },
+		{ spanish: "Pabilo", maya: "K’uuch" },
+		{ spanish: "Paciencia", maya: "Chuka’an óol, pa’at" },
+		{ spanish: "Padecer", maya: "Muk’yaj" },
+		{ spanish: "Padrastro", maya: "Majan yuum" },
+		{ spanish: "Padre", maya: "Yuum, taat, taatáa" },
+		{ spanish: "Pagar", maya: "Bo’ol" },
+		{ spanish: "Página", maya: "Yich ju’un, táan ju’un" },
+		{ spanish: "Paila", maya: "Nojoch yéetel kóoch kuum" },
+		{ spanish: "País", maya: "Lu’umil" },
+		{ spanish: "Paisaje", maya: "Junxéet’ lu’um, k’áax wáa k’aak’náab jach jats’uts" },
+		{ spanish: "Paja", maya: "Su’uk" },
+		{ spanish: "Pájaro", maya: "Ch’íich’" },
+		{ spanish: "Pala", maya: "Jo’opob" },
+		{ spanish: "Palabra", maya: "T’aan, t’aanil" },
+		{ spanish: "Paladar", maya: "Nab ka’an" },
+		{ spanish: "Palidecer", maya: "Sakpile’ental, saktal" },
+		{ spanish: "Palillo", maya: "Ch’ilib" },
+		{ spanish: "Palma", maya: "Xa’an" },
+		{ spanish: "Palmear", maya: "Papax k’ab, lalaj k’ab" },
+		{ spanish: "Palmo", maya: "Nab, nab k’ab" },
+		{ spanish: "Palo", maya: "Che’" },
+		{ spanish: "Paloma", maya: "Úukum, tsuutsuy, sakpakal" },
+		{ spanish: "Palpitar", maya: "Síit’, péek" },
+		{ spanish: "Paludismo", maya: "Ke’el chokwil" },
+		{ spanish: "Pan", maya: "Waaj" },
+		{ spanish: "Panadería", maya: "Naj tu’ux ku meenta’al yéetel ku ko’onol waaj" },
+		{ spanish: "Panal", maya: "Pak’ kaab wáa xuux" },
+		{ spanish: "Pantaleta", maya: "Eex" },
+		{ spanish: "Pantalón", maya: "Eex" },
+		{ spanish: "Pantorrilla", maya: "P’ul ook, t’óon" },
+		{ spanish: "Panza", maya: "Tsuuk, nak’" },
+		{ spanish: "Pañal", maya: "Táas iit" },
+		{ spanish: "Paño", maya: "Xéet’ nook’ tia’al u yúuchul cho’" },
+		{ spanish: "Papá", maya: "Yuum, taat, taatáa" },
+		{ spanish: "Papada", maya: "K’oj, k’o’och, chíin" },
+		{ spanish: "Papaya", maya: "Puut" },
+		{ spanish: "Papel", maya: "Ju’un" },
+		{ spanish: "Papera", maya: "Chuchup kaal" },
+		{ spanish: "Par", maya: "Ka’, ts’áam" },
+		{ spanish: "Para", maya: "Tia’al" },
+		{ spanish: "Paralizar", maya: "Wa’atal, wa’akun, je’elel" },
+		{ spanish: "Parar", maya: "Wa’atal, wa’akun, je’elel" },
+		{ spanish: "Parecer", maya: "Chíikpajal" },
+		{ spanish: "Pared", maya: "Pak’" },
+		{ spanish: "Pariente", maya: "Láak’, láak’ tsil, éet k’i’ik’el" },
+		{ spanish: "Parir", maya: "Aalan, óolinkun" },
+		{ spanish: "Parpadear", maya: "Múumuts’ ich, p’i’ip’i’il ich" },
+		{ spanish: "Párpado", maya: "Sóol ich, paach ich" },
+		{ spanish: "Partera", maya: "(x)aalans, (x)ilaj k’oja’an" },
+		{ spanish: "Partícula", maya: "P’úuy, p’úuyul, xéet’, káach" },
+		{ spanish: "Partir", maya: "Buuj, xeet’, xiik, xoot, jaats, teej" },
+		{ spanish: "Pasar", maya: "Máan" },
+		{ spanish: "Pasear", maya: "Ximbal, máan" },
+		{ spanish: "Paseo", maya: "Xíimbal, máan" },
+		{ spanish: "Pasión", maya: "Muk’yaj, ts’íibolal, óol" },
+		{ spanish: "Paso", maya: "Xáak’ab" },
+		{ spanish: "Pastar", maya: "Jáalsuum" },
+		{ spanish: "Pasto", maya: "Su’uk, xíiw" },
+		{ spanish: "Pastor", maya: "Máak ku kanáantik ba’alche’o’ob" },
+		{ spanish: "Pata", maya: "Ook, mooch’, xaaw" },
+		{ spanish: "Patear", maya: "Kóochak’, jáanchak’" },
+		{ spanish: "Patio", maya: "Táankab" },
+		{ spanish: "Patria", maya: "Lu’umil k kaaj" },
+		{ spanish: "Pavo", maya: "Úulum, tso’, (x)tuux, kuuts" },
+		{ spanish: "Payaso", maya: "Chi’ik" },
+		{ spanish: "Peca", maya: "Eek’, yeek’" },
+		{ spanish: "Pecado", maya: "K’eban, si’ipil" },
+		{ spanish: "Pecador", maya: "(j)k’eban, xk’eban" },
+		{ spanish: "Pecar", maya: "Kuch k’eban, kuch si’ipil" },
+		{ spanish: "Pécari", maya: "Kitam" },
+		{ spanish: "Pecho", maya: "Tseem" },
+		{ spanish: "Pechuga", maya: "Tseemil ch’íich’, sak bak’, tseem" },
+		{ spanish: "Pedazo", maya: "Xóot’, xéet’, káach, kóots" },
+		{ spanish: "Pedernal", maya: "Tok’, tok’ tuunich" },
+		{ spanish: "Pedir", maya: "K’áat" },
+		{ spanish: "Pedo", maya: "Kiis" },
+		{ spanish: "Pegar", maya: "Taak’, paak’, jaats’" },
+		{ spanish: "Peinar", maya: "Xáach, xáache’t" },
+		{ spanish: "Peine", maya: "Xáache’, xáacheb" },
+		{ spanish: "Pelagra", maya: "Tikin sóolba" },
+		{ spanish: "Pelar", maya: "Ts’íil, súus, k’oos" },
+		{ spanish: "Pelear", maya: "Ba’ate’el, ba’ate’il" },
+		{ spanish: "Pelícano", maya: "P’onto’" },
+		{ spanish: "Pelo", maya: "Tso’ots" },
+		{ spanish: "Pelón", maya: "K’olis" },
+		{ spanish: "Peludo", maya: "Máak wáa ba’alche’ jach ya’ab u tso’otsel" },
+		{ spanish: "Peluquería", maya: "Kúuchil k’oos" },
+		{ spanish: "Pelvis", maya: "T’eet’" },
+		{ spanish: "Pellejo", maya: "Oot’, oot’el" },
+		{ spanish: "Pellizcar", maya: "Xe’ep’, le’ep’" },
+		{ spanish: "Penacho", maya: "P’oot" },
+		{ spanish: "Penca", maya: "Le’ kij, le’kiiw" },
+		{ spanish: "Pendejo", maya: "Sajlu’um, meeten keep" },
+		{ spanish: "Pene", maya: "Keep, toon, xiibil" },
+		{ spanish: "Penetrar", maya: "Okol, okoj, máan, táats’ máan, póot máan" },
+		{ spanish: "Pensamiento", maya: "Tuukul" },
+		{ spanish: "Pensar", maya: "Tuukul" },
+		{ spanish: "Peón", maya: "(j)Xíimbal máak, (j) meeyjil máak" },
+		{ spanish: "Pepita", maya: "Neek’, tóop, sikil" },
+		{ spanish: "Pequeño", maya: "Chan, chichan, mejen, ts’iris" },
+		{ spanish: "Perder", maya: "Saat" },
+		{ spanish: "Perdiz", maya: "Noom" },
+		{ spanish: "Perdonar", maya: "Sa’as si’ipil, sa’asa’al si’ipil" },
+		{ spanish: "Perdurar", maya: "Xáantal" },
+		{ spanish: "Perecer", maya: "Kíimil" },
+		{ spanish: "Peregrinar", maya: "Xíinxinbal, máansbaj" },
+		{ spanish: "Perezoso", maya: "Ma’k’óol, jooykep, jooypel" },
+		{ spanish: "Perforar", maya: "Poot, jool" },
+		{ spanish: "Perfumar", maya: "Ki’bokkin, ki’bokkun" },
+		{ spanish: "Perfume", maya: "Ki’bok, ki’bokil" },
+		{ spanish: "Período", maya: "K’iin, k’iinil" },
+		{ spanish: "Permitir", maya: "Cha’" },
+		{ spanish: "Pero", maya: "Kux" },
+		{ spanish: "Perro", maya: "Peek’, xiibil peek’, ch’upul peek’" },
+		{ spanish: "Perseguir", maya: "Áalkab paach, ch’a’ paach, tsay paach" },
+		{ spanish: "Persona", maya: "May, wíinik" },
+		{ spanish: "Perverso", maya: "K’ak’as máak, k’asa’an, kisin máak" },
+		{ spanish: "Pervertir", maya: "K’askun" },
+		{ spanish: "Pesadilla", maya: "Wayak’, k’ak’as náay" },
+		{ spanish: "Pesar", maya: "Yaj óol" },
+		{ spanish: "Pesar", maya: "P’iis" },
+		{ spanish: "Pescado", maya: "Kay" },
+		{ spanish: "Pescar", maya: "Chuuk, chuk kay, maach" },
+		{ spanish: "Pescozón", maya: "K’oop, wáas k’op" },
+		{ spanish: "Pescuezo", maya: "Kaal" },
+		{ spanish: "Peso", maya: "Aalil" },
+		{ spanish: "Pestaña", maya: "Máatsab, máatsa’" },
+		{ spanish: "Pestañar", maya: "Muts’ ich" },
+		{ spanish: "Peste", maya: "K’oja’anil ku meentik u yantal báan kíimilil" },
+		{ spanish: "Petate", maya: "Póop" },
+		{ spanish: "Pez", maya: "Kay" },
+		{ spanish: "Pezón", maya: "Pool Im" },
+		{ spanish: "Pezuña", maya: "Maay" },
+		{ spanish: "Piar", maya: "Ts’its’ianki" },
+		{ spanish: "Picar", maya: "T’óoch, chi’" },
+		{ spanish: "Picazón", maya: "Saak’, saak’il" },
+		{ spanish: "Pico", maya: "U Koj ch’íich’, u ni’ ch’íich" },
+		{ spanish: "Pie", maya: "Ook" },
+		{ spanish: "Piedra", maya: "Tuunich" },
+		{ spanish: "Piel", maya: "Oot’, oot’el" },
+		{ spanish: "Pierna", maya: "T’óon" },
+		{ spanish: "Pinchar", maya: "Loom" },
+		{ spanish: "Pinole", maya: "K’áaj" },
+		{ spanish: "Pintar", maya: "Boon" },
+		{ spanish: "Piñata", maya: "P’úul" },
+		{ spanish: "Piñuela", maya: "Ch’am, ch’om" },
+		{ spanish: "Piojo", maya: "Uk’" },
+		{ spanish: "Pipián", maya: "Óom sikil" },
+		{ spanish: "Pisar", maya: "Pe’echak’, ts’a’acha’, ts’áancha’" },
+		{ spanish: "Piso", maya: "Lu’um" },
+		{ spanish: "Pisotear", maya: "Pepe’echak’, pepe’echa’" },
+		{ spanish: "Pizote", maya: "Chi’ik" },
+		{ spanish: "Placer", maya: "Ki’imak óolal" },
+		{ spanish: "Planchar", maya: "Ji’, yúul, taats’" },
+		{ spanish: "Planta", maya: "Aban, che’, xíiw" },
+		{ spanish: "Plantar", maya: "Pak’, pak’al, xaab" },
+		{ spanish: "Plantío", maya: "Pak’al" },
+		{ spanish: "Plátano", maya: "Ja’as" },
+		{ spanish: "Platicar", maya: "Tsikbal, t’aan" },
+		{ spanish: "Plato", maya: "U nu’ukul tu’ux ku ts’a’abal janal wáa je’ ba’axak tia’al jaantbile’" },
+		{ spanish: "Playa", maya: "Jáal ja’, jáal k’aak’náab, chi’ k’áak’náab" },
+		{ spanish: "Plaza", maya: "K’íiwik, chúumuk kaaj" },
+		{ spanish: "Plazo", maya: "Xot k’iin, xot’ k’iin" },
+		{ spanish: "Pleito", maya: "Ba’ate’el, ba’ate’il" },
+		{ spanish: "Pliego", maya: "Wuuts’, paak" },
+		{ spanish: "Pluma", maya: "K’u’uk’um" },
+		{ spanish: "Población", maya: "Kaaj, kajtalil" },
+		{ spanish: "Poblar", maya: "Kajkun" },
+		{ spanish: "Pobre", maya: "Óotsil" },
+		{ spanish: "Pochote", maya: "Ch’oj, pi’im" },
+		{ spanish: "Poder", maya: "Muuk’" },
+		{ spanish: "Poder", maya: "Páajtal" },
+		{ spanish: "Podrido", maya: "Tu’, tu’ja’an, k’aas, k’asa’an" },
+		{ spanish: "Podrir", maya: "Tu’tal, tu’taj" },
+		{ spanish: "Polen", maya: "U ta’anil lool ts’o’ok u k’antal" },
+		{ spanish: "Polígamo", maya: "(x)Ch’up wáa (j)xiib maanal ti’ juntúul u yichamo’ob wáa yatano’ob" },
+		{ spanish: "Polilla", maya: "Ik’el, cháabche’" },
+		{ spanish: "Polución", maya: "U jóok’ol wáa u wéekel u sa’il keep" },
+		{ spanish: "Polvear", maya: "Tóos, póos" },
+		{ spanish: "Pollo", maya: "T’aaw, chan t’eel, kuluul" },
+		{ spanish: "Poner", maya: "Ts’aa, taak" },
+		{ spanish: "Poniente", maya: "Chik’in" },
+		{ spanish: "Ponzoña", maya: "K’i’inam" },
+		{ spanish: "Por", maya: "Tumen, tu yo’olal, yóok’lal" },
+		{ spanish: "Porción", maya: "Ts’e’ets’ek, p’íit" },
+		{ spanish: "Porque", maya: "Tumen" },
+		{ spanish: "Por qué", maya: "Ba’ax ten" },
+		{ spanish: "Posada", maya: "Majan naj" },
+		{ spanish: "Posar", maya: "Túuchul, jáayal, ts’áamal" },
+		{ spanish: "Posible", maya: "Unaj, páajtal" },
+		{ spanish: "Posición", maya: "Anik, anil" },
+		{ spanish: "Postema", maya: "Chu’uchum" },
+		{ spanish: "Potro", maya: "Toon tsíimin, xiibil tsíimin" },
+		{ spanish: "Pozo", maya: "Ch’e’en" },
+		{ spanish: "Pozole", maya: "K’eyem, k’eyen" },
+		{ spanish: "Preceder", maya: "Paybe, biin táanil, máan táanil" },
+		{ spanish: "Precio", maya: "Tojol" },
+		{ spanish: "Precioso", maya: "Jats’uts, ki’ichkelem, ki’ichpam" },
+		{ spanish: "Precoz", maya: "Peew" },
+		{ spanish: "Predicar", maya: "Tseek" },
+		{ spanish: "Preferir", maya: "Icht" },
+		{ spanish: "Pregona", maya: "K’a’ay" },
+		{ spanish: "Preguntar", maya: "K’áat, k’áat chi’" },
+		{ spanish: "Prematuro", maya: "Ma’ chuka’an u k’iini, ma’ k’ucha’an u k’iini’" },
+		{ spanish: "Premeditación", maya: "Tuukul u tukla’al wáa ba’ax táanil ti’ u meenta’al" },
+		{ spanish: "Premiar", maya: "Bo’ol" },
+		{ spanish: "Prender", maya: "Maach, cháach" },
+		{ spanish: "Preñada", maya: "Yo’om" },
+		{ spanish: "Preñez", maya: "Yo’om, yo’omtal" },
+		{ spanish: "Preparar", maya: "Beet, meen" },
+		{ spanish: "Presagiar", maya: "Tomoj chi’, tomok chi’" },
+		{ spanish: "Presencia", maya: "Táan, tu táan" },
+		{ spanish: "Presentir", maya: "Kóojol, kóojol" },
+		{ spanish: "Preservar", maya: "Ta’ak" },
+		{ spanish: "Presidente", maya: "Nojoch jalach wíinik" },
+		{ spanish: "Presionar", maya: "Ts’aal, peets’" },
+		{ spanish: "Preso", maya: "K’ala’an" },
+		{ spanish: "Préstamo", maya: "Páay, majan" },
+		{ spanish: "Prestar", maya: "Páay, majan" },
+		{ spanish: "Presumir", maya: "U’uyba nojchil, u’uyba noj ba’al" },
+		{ spanish: "Pretender", maya: "K’áat" },
+		{ spanish: "Primavera", maya: "Yáax k’iin" },
+		{ spanish: "Primero", maya: "Yáax, táanil" },
+		{ spanish: "Primicia", maya: "Jolbes" },
+		{ spanish: "Primo", maya: "Ka’ suku’un, ka’ kiik, ka’ íits’in" },
+		{ spanish: "Principiar", maya: "Káajal, lékel, chúunpajal, jo’op’ol" },
+		{ spanish: "Principio", maya: "Chuun, káajal" },
+		{ spanish: "Pringar", maya: "Wiits’" },
+		{ spanish: "Prisa", maya: "Séeb, sséebil, séeba’an" },
+		{ spanish: "Privar", maya: "Luk’s, tseel" },
+		{ spanish: "Probar", maya: "Túun, túum" },
+		{ spanish: "Problema", maya: "Toop" },
+		{ spanish: "Proclamar", maya: "A’al, ts’aa ojéetbil" },
+		{ spanish: "Producir", maya: "Ts’aa, antal" },
+		{ spanish: "Profesor", maya: "Kaambesaj, kaansaj" },
+		{ spanish: "Prófugo", maya: "May puuts’ul" },
+		{ spanish: "Profundo", maya: "Taam" },
+		{ spanish: "Prohibir", maya: "Weet’" },
+		{ spanish: "Prójimo", maya: "Láak’, éet wíinikil" },
+		{ spanish: "Proletario", maya: "Meeyjil máak, kolnáal" },
+		{ spanish: "Promulgar", maya: "A’al, ts’aa ojéetbil" },
+		{ spanish: "Pronto", maya: "Séeb, jáan" },
+		{ spanish: "Propagar", maya: "Ya’abtal, nojochtal" },
+		{ spanish: "Propiedad", maya: "Ti’il, tia’al" },
+		{ spanish: "Propio", maya: "Tia’al" },
+		{ spanish: "Prostituta", maya: "Káakbach, (x)káakbach" },
+		{ spanish: "Protector", maya: "Aantaj, kanan" },
+		{ spanish: "Proteger", maya: "Kalan, kanan, baal" },
+		{ spanish: "Provincia", maya: "Chan kaaj, peten lu’um, káakab" },
+		{ spanish: "Provocar", maya: "Kaxan ba’ate’el, kaxan k’uuxil, kéex" },
+		{ spanish: "Pueblo", maya: "Kaaj" },
+		{ spanish: "Puerco", maya: "K’eek’en, beel, xleech" },
+		{ spanish: "Puerta", maya: "Joonaj, jool naj" },
+		{ spanish: "Pujar", maya: "Áakam, men muuk’" },
+		{ spanish: "Pulga", maya: "Ch’ik" },
+		{ spanish: "Pulgar", maya: "Na’ k’ab" },
+		{ spanish: "Pulgón", maya: "Pok’ol" },
+		{ spanish: "Pulir", maya: "Jaab, jabalkun" },
+		{ spanish: "Pulmón", maya: "Sak óol, sot’ot, soorot’" },
+		{ spanish: "Pulsera", maya: "K’aap" },
+		{ spanish: "Pulverizar", maya: "P’uuy, juuch’" },
+		{ spanish: "Puma", maya: "Koj" },
+		{ spanish: "Punta", maya: "Ni’, xuul, p’iich" },
+		{ spanish: "Punzar", maya: "Juup’, loom, ts’oop" },
+		{ spanish: "Puñado", maya: "Lóoch’, óok, láap’" },
+		{ spanish: "Puño", maya: "Wol k’ab, tap’ k’ab" },
+		{ spanish: "Pupila", maya: "Neek’ ich" },
+		{ spanish: "Pus", maya: "Puj" }
+
+        ];
+
+        // Función para capitalizar solo la primera letra.
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        }
+
+        // Función principal para renderizar la lista
+        function renderDictionary() {
+            const listContainer = document.getElementById('dictionary-list');
+            listContainer.innerHTML = ''; // Limpiar el mensaje de carga
+
+            DICTIONARY_DATA.forEach((item, index) => {
+                const spanishWord = capitalizeFirstLetter(item.spanish);
+
+                // 1. Creación de la tarjeta/elemento de definición
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 sm:p-5 rounded-xl shadow-lg hover:shadow-xl transition-shadow card-divider';
+                
+                // 2. Palabra en español (clickeable)
+                const spanishEl = document.createElement('h2');
+                // Añadimos un ID único para poder vincular la definición a este elemento.
+                spanishEl.id = `word-${index}`; 
+                spanishEl.className = 'spanish-word text-xl sm:text-2xl font-extrabold mb-1 select-none'; // select-none evita que el texto se seleccione al hacer clic
+                spanishEl.textContent = spanishWord;
+
+                // 3. Contenedor de la definición en maya (Inicialmente oculta)
+                const mayaContainer = document.createElement('div');
+                // Clase CSS para ocultar/mostrar con animación
+                mayaContainer.className = 'maya-definition'; 
+                mayaContainer.id = `definition-${index}`;
+
+                // 4. Contenido de la definición
+                const mayaEl = document.createElement('p');
+                mayaEl.className = 'text-base sm:text-lg text-text-primary leading-relaxed';
+                mayaEl.textContent = item.maya;
+                
+                // 5. Armar la definición dentro del contenedor
+                mayaContainer.appendChild(mayaEl);
+
+                // 6. Configurar el evento de click en la palabra en español
+                spanishEl.addEventListener('click', () => {
+                    // Alternar la clase 'visible' para mostrar u ocultar la definición
+                    mayaContainer.classList.toggle('visible');
+
+                    // Opcional: Ocultar todas las demás definiciones abiertas
+                    // document.querySelectorAll('.maya-definition.visible').forEach(def => {
+                    //     if (def.id !== mayaContainer.id) {
+                    //         def.classList.remove('visible');
+                    //     }
+                    // });
+                });
+
+                // 7. Armar la tarjeta completa
+                card.appendChild(spanishEl);
+                // El separador se moverá justo antes del contenido en maya visible
+                const divider = document.createElement('div');
+                divider.className = 'w-10 h-0.5 bg-maya-gray/50 mb-1 rounded-full';
+                
+                // Se coloca el separador dentro del contenedor oculto/visible para que aparezca con la definición.
+                mayaContainer.prepend(divider); 
+                
+                card.appendChild(mayaContainer);
+
+                listContainer.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDictionary);
+
+    </script>
+</body>
+</html>

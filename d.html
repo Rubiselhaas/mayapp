@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MayApp - Letra D</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Definición de la paleta de colores en CSS para usar en JS y como utilidad */
+        :root {
+            --color-maroon: #9F2241;
+            --color-khaki: #BCA986;
+            --color-green: #235B4E;
+            --color-gray: #888B8D;
+            --color-text-primary: #1F2937; /* Darker text for readability */
+        }
+        
+        /* Configuración de Tailwind para usar las variables de color */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'maya-maroon': 'var(--color-maroon)',
+                        'maya-khaki': 'var(--color-khaki)',
+                        'maya-green': 'var(--color-green)',
+                        'maya-gray': 'var(--color-gray)',
+                        'text-primary': 'var(--color-text-primary)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+
+        /* Estilo base para asegurar que la fuente Inter se aplique */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        /* Estilos del encabezado */
+        .header-bg {
+            background-color: var(--color-maroon);
+        }
+        .header-text {
+            color: var(--color-khaki);
+        }
+
+        /* Estilo para la palabra en español (clickable) */
+        .spanish-word {
+            color: var(--color-green);
+            cursor: pointer; /* Indica que es clickeable */
+            transition: color 0.2s ease-in-out;
+        }
+        .spanish-word:hover {
+            color: #1A473C; /* Un verde un poco más oscuro al pasar el ratón */
+        }
+
+        /* CLASE PARA LA DEFINICIÓN OCULTA */
+        .maya-definition {
+            max-height: 0; /* Inicialmente oculto */
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        /* CLASE PARA LA DEFINICIÓN VISIBLE */
+        .maya-definition.visible {
+            max-height: 100px; /* Suficientemente grande para contener la definición */
+            opacity: 1;
+            margin-top: 0.5rem; /* Pequeño margen superior al mostrar */
+        }
+        
+        /* Estilo para el separador o borde de los elementos */
+        .card-divider {
+            border-bottom: 1px solid var(--color-gray);
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- Encabezado Fijo -->
+    <header class="header-bg shadow-lg sticky top-0 z-10 rounded-b-xl">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="header-text text-xl sm:text-2xl font-bold tracking-wider">
+                MayApp - Diccionario maya
+            </h1>
+            <span class="bg-maya-khaki text-maya-maroon px-3 py-1 text-sm font-semibold rounded-full shadow-md">
+                Letra D
+            </span>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal de la Lista -->
+    <main class="max-w-4xl mx-auto p-4 pt-8">
+        <div id="dictionary-list" class="space-y-4">
+            <!-- Las tarjetas del diccionario se renderizarán aquí -->
+            <div class="text-center p-8 text-maya-gray">Cargando palabras...</div>
+        </div>
+    </main>
+
+    <!-- Pie de página discreto -->
+    <footer class="mt-12 py-4 bg-gray-100 text-center text-xs text-maya-gray border-t border-maya-gray/30">
+        <p>Proyecto de Lengua y Cultura Maya. Haz clic en la palabra en español para ver la traducción.</p>
+    </footer>
+
+    <script>
+        // Datos del diccionario actualizados del documento 'A [actualizado].docx', corregidos hasta AZUZAR.
+        // Formato: { spanish: "Palabra Española", maya: "DEFINICIÓN EN MAYA" }
+        const DICTIONARY_DATA = [
+            
+		{ spanish: "Dama", maya: "Xunáan, ko’olel." },
+		{ spanish: "Danza", maya: "Óok’ot." },
+		{ spanish: "Danzar", maya: "Óok’ot" },
+		{ spanish: "Dañar", maya: "K’askuun, meen loob." },
+		{ spanish: "Daño", maya: "Loob." },
+		{ spanish: "Dar", maya: "Ts’aa." },
+		{ spanish: "Dardo", maya: "Juul." },
+		{ spanish: "Debajo", maya: "Yáanal, yaalan, kaabaj, kaabal." },
+		{ spanish: "Deber", maya: "P’aax." },
+		{ spanish: "Débil", maya: "T’o’ona’an, ma’ muuk’il." },
+		{ spanish: "Decaer", maya: "T’oontal, máan óol." },
+		{ spanish: "Decepción", maya: "Ok’om óolal." },
+		{ spanish: "Deceso", maya: "Kíimil." },
+		{ spanish: "Decir", maya: "A’al, t’aan." },
+		{ spanish: "Declarar", maya: "U nu’ukbes, tsool, ts’aa un’uk, a’al." },
+		{ spanish: "Declinar", maya: "Éemel, p’áatal." },
+		{ spanish: "Decorar", maya: "Jats’utskuun, jats’ utskin." },
+		{ spanish: "Dedicar", maya: "Ts’aa óol, k’uub óol." },
+		{ spanish: "Dedo", maya: "Aal k’ab, aal ook." },
+		{ spanish: "Defecar", maya: "Ta’." },
+		{ spanish: "Defender", maya: "Áantaj, took." },
+		{ spanish: "Deformar", maya: "Yaach’, yuuch’." },
+		{ spanish: "Deforme", maya: "Móoch, yaach’." },
+		{ spanish: "Defraudar", maya: "Ookol, tuus." },
+		{ spanish: "Defunción", maya: "Kíimil." },
+		{ spanish: "Degenerado", maya: "(j)K’aschaja’an, (x)k’aschaja’an." },
+		{ spanish: "Degenerar", maya: "K’astal, k’aschajal, k’aspajal, k’askuun." },
+		{ spanish: "Deglutir", maya: "Luuk’, táats’ luuk’, túuts’ luuk’." },
+		{ spanish: "Degollado", maya: "Ma’ kaal, kúul kaal." },
+		{ spanish: "Degollar", maya: "Xot kaal, k’up kaal, ch’ak, kúul kaal, luk’s kaal." },
+		{ spanish: "Degradar", maya: "Óotsikun, t’oonkin, jaaykun." },
+		{ spanish: "Deidad", maya: "K’uj." },
+		{ spanish: "Dejar", maya: "P’aat." },
+		{ spanish: "Delante", maya: "Táan, táanil, aktáan." },
+		{ spanish: "Delatar", maya: "Tak pool, tak jo’ol." },
+		{ spanish: "Deleitar", maya: "Ki’kun óol." },
+		{ spanish: "Delgado", maya: "Bek’ech, bi’ich’, ts’ooy, ts’oya’an, jaay." },
+		{ spanish: "Delicado", maya: "Neets." },
+		{ spanish: "Delicioso", maya: "Ki’" },
+		{ spanish: "Delinquir", maya: "Si’ip." },
+		{ spanish: "Delirar", maya: "T’aant’an pool, t’aant’an jo’ol." },
+		{ spanish: "Delito", maya: "Si’ipil, k’eban." },
+		{ spanish: "Demanda", maya: "K’áant, tsaa." },
+		{ spanish: "Demandar", maya: "K’áat, tak pool, tak jo’ol." },
+		{ spanish: "Demente", maya: "Choko pool, choko jo’ol." },
+		{ spanish: "Demonio", maya: "Kisin, k’aasi ba’al, xulub." },
+		{ spanish: "Demorar", maya: "Xáantal." },
+		{ spanish: "Demostrar", maya: "E’es," },
+		{ spanish: "Denso", maya: "Tat." },
+		{ spanish: "Dentadura", maya: "Koj." },
+		{ spanish: "Dentera", maya: "Cha’aj, cha’a koj." },
+		{ spanish: "Dentro", maya: "Ich, ichil, ichij." },
+		{ spanish: "Denunciar", maya: "Tak pool, tak jo’ol, a’al." },
+		{ spanish: "Departir", maya: "Tsikbal." },
+		{ spanish: "Dependiente", maya: "(j)Koonol, (x)koonol." },
+		{ spanish: "Depilar", maya: "K’oos, ts’iik, jok tso’ots." },
+		{ spanish: "Deplorar", maya: "Yaj óolt." },
+		{ spanish: "Deporte", maya: "Báaxal." },
+		{ spanish: "Depositar", maya: "Ts’aa, k’uub." },
+		{ spanish: "Depósito", maya: "Cháaltun, jaltun." },
+		{ spanish: "Derecho", maya: "No’oj, toj, táats’." },
+		{ spanish: "Derramar", maya: "Week, tiix, láal, k’iit." },
+		{ spanish: "Derretir", maya: "Yiib, yaal, puuk’." },
+		{ spanish: "Derribar", maya: "Lúubs, juut, puuk, niik." },
+		{ spanish: "Derrocar", maya: "Luuk’s, lúubs." },
+		{ spanish: "Derrochar", maya: "Xuup." },
+		{ spanish: "Derrumbar", maya: "Juut, niik, jeen, puul." },
+		{ spanish: "Desabrochar", maya: "Waach’" },
+		{ spanish: "Desafío", maya: "Ba’ate’el, ba’ate’il." },
+		{ spanish: "Desagarrar", maya: "Jáalk’abt, cha’." },
+		{ spanish: "Desaguar", maya: "Jo’os ja’, pul ja’, wek ja’." },
+		{ spanish: "Desajustar", maya: "Cha’." },
+		{ spanish: "Desaparecer", maya: "Saat, baal." },
+		{ spanish: "Desarrollado", maya: "Nojoch chaja’an, nukchaja’an, ma’alob chaja’an." },
+		{ spanish: "Desatar", maya: "Waach’, cha’." },
+		{ spanish: "Desayuno", maya: "Uk’ul." },
+		{ spanish: "Desbaratar", maya: "Joob, juut, puuk, pa’, niik, tilik." },
+		{ spanish: "Desbastar", maya: "Póol, jo’och." },
+		{ spanish: "Desbordar", maya: "Tuul." },
+		{ spanish: "Descalabrar", maya: "Ch’in pool, jats’ pool." },
+		{ spanish: "Descalzar", maya: "Tsel xanab, luk’s xanab." },
+		{ spanish: "Descalzo", maya: "Ma’ xanab." },
+		{ spanish: "Descansar", maya: "Je’elel, wa’atal." },
+		{ spanish: "Descanso", maya: "Je’elel, wa’atal." },
+		{ spanish: "Descargar", maya: "Éems kuuch, luk’s kuuch." },
+		{ spanish: "Descendencia", maya: "Ch’i’ibal, aalo’ob, mejeno’ob." },
+		{ spanish: "Descender", maya: "Éemel, ts’aam, jáayal." },
+		{ spanish: "Descifrar", maya: "Na’at." },
+		{ spanish: "Descomunal", maya: "Táaj nojoch." },
+		{ spanish: "Descontar", maya: "Luk’s, eems tojol, éens tojol." },
+		{ spanish: "Describir", maya: "Tsool." },
+		{ spanish: "Descuartizar", maya: "P’aay, xo’xo’ot" },
+		{ spanish: "Descubrir", maya: "Síil, kaxáant." },
+		{ spanish: "Descuidar", maya: "Náays óol" },
+		{ spanish: "Desdentar", maya: "Jots’ koj." },
+		{ spanish: "Desear", maya: "K’áat, óot, ts’iibol taak, pooch." },
+		{ spanish: "Desechar", maya: "Puul, juk’s." },
+		{ spanish: "Deseo", maya: "Taak, ts’íibol, poochil," },
+		{ spanish: "Desertar", maya: "Jóok’ol, púuts’ul." },
+		{ spanish: "Desesperación", maya: "Xet’ óol, náaks óol, ts’íikil." },
+		{ spanish: "Desfallecer", maya: "Sat óol." },
+		{ spanish: "Desfilar", maya: "Tsol xíimbal." },
+		{ spanish: "Desflorar", maya: "Jaat, t’aak." },
+		{ spanish: "Desfondar", maya: "Joomchajal, tonchajal." },
+		{ spanish: "Desgarrar", maya: "La’ach, jaat, xeet’." },
+		{ spanish: "Desgracia", maya: "Toop, loob, k’aas." },
+		{ spanish: "Desgraciar", maya: "K’askuun" },
+		{ spanish: "Desgranar", maya: "Oxo’on, p’eel, p’uuch." },
+		{ spanish: "Deshacer", maya: "Puuk’, pa’, juub juut." },
+		{ spanish: "Deshidratación", maya: "Wach’k’ajal" },
+		{ spanish: "Deshierba", maya: "Páak." },
+		{ spanish: "Deshilar", maya: "Jíil, jíit, tilik." },
+		{ spanish: "Deshinchar", maya: "Ts’uum, ts’úumul." },
+		{ spanish: "Deshojar", maya: "Luk’s le’, p’éep’ t’ok le’." },
+		{ spanish: "Deshonrar", maya: "K’askuun, t’aak." },
+		{ spanish: "Desistir", maya: "P’aat." },
+		{ spanish: "Desleir", maya: "Puuk’, yaach’." },
+		{ spanish: "Deslindar", maya: "Xot’ k’áax." },
+		{ spanish: "Deslizar", maya: "Jaak, kiip, piit." },
+		{ spanish: "Deslumbrar", maya: "Juul ich." },
+		{ spanish: "Desmayar", maya: "Sa’atal óol, sak kimen." },
+		{ spanish: "Desmonte", maya: "Kol k’áax." },
+		{ spanish: "Desnivel", maya: "Níix, níixkab, t’oont’on." },
+		{ spanish: "Desnudar", maya: "Chaknúult, pit nook’, tsel nook’, luk’s nook’." },
+		{ spanish: "Desnudo", maya: "Chaknúul, ma’ nook’." },
+		{ spanish: "Desollar", maya: "Ts’iip, p’e’es." },
+		{ spanish: "Despacio", maya: "Chaanbéel, junjunp’íit." },
+		{ spanish: "Despachar", maya: "Túuxt." },
+		{ spanish: "Despedir", maya: "Cha’, jóok’s, luk’s, tojol ch’in." },
+		{ spanish: "Despegar", maya: "Laak." },
+		{ spanish: "Despeinar", maya: "Xa’axak’ pool." },
+		{ spanish: "Despejar", maya: "Píik’, chíikbes." },
+		{ spanish: "Despepitar", maya: "P’eel, ts’eej." },
+		{ spanish: "Desperdicio", maya: "Xiix, yala’." },
+		{ spanish: "Despertar", maya: "Ajal." },
+		{ spanish: "Despistar", maya: "Saat." },
+		{ spanish: "Desplomar", maya: "Báanal, jeen, luut, luub, niik" },
+		{ spanish: "Desplumar", maya: "P’éep’." },
+		{ spanish: "Despoblado", maya: "La’ kaaj, kaaj mina’an u máakilo’ob." },
+		{ spanish: "Despoblar", maya: "U bin u kajnáalilo’ob junp’éel kaaj" },
+		{ spanish: "Despojar", maya: "Luk’s, took, tseel." },
+		{ spanish: "Déspota", maya: "K’asa’an, topa’an." },
+		{ spanish: "Desprender", maya: "Báanal, taak, luub, poots’." },
+		{ spanish: "Destapar", maya: "Je’, tsel maak." },
+		{ spanish: "Destetar", maya: "Tok iim, tok chu’uch, luk’s chu’uch." },
+		{ spanish: "Destilar", maya: "K’aabankil." },
+		{ spanish: "Destituir", maya: "Jóok’s, luk’s." },
+		{ spanish: "Destreza", maya: "Péek, séeba’anil, péeka’anil." },
+		{ spanish: "Destrozar", maya: "Xeet’, tsi’ik." },
+		{ spanish: "Destruir", maya: "K’askuun, niik, juut." },
+		{ spanish: "Desvalido", maya: "Nuum." },
+		{ spanish: "Desvalijar", maya: "Ookol, tseel u ba’alo’ob." },
+		{ spanish: "Desvanecer", maya: "Xiib." },
+		{ spanish: "Desviación", maya: "Looch, ch’oot." },
+		{ spanish: "Desviar", maya: "Looch, ch’oot, ch’eet, k’eech." },
+		{ spanish: "Desvío", maya: "Jáal paach, pach bej." },
+		{ spanish: "Desvirgar", maya: "K’askuun, t’aak." },
+		{ spanish: "Desyerba", maya: "Páak." },
+		{ spanish: "Desyerbar", maya: "Páak." },
+		{ spanish: "Detectar", maya: "Kaxan." },
+		{ spanish: "Detener", maya: "Je’elel, je’els, wa’atal, wa’akuns, k’aal" },
+		{ spanish: "Deteriorar", maya: "K’astal, júutul, laabtal, úuchbental." },
+		{ spanish: "Detestar", maya: "P’eek." },
+		{ spanish: "Detonar", maya: "Waak’." },
+		{ spanish: "Detrás", maya: "Paach, paachil." },
+		{ spanish: "Deuda", maya: "P’aax." },
+		{ spanish: "Deudo", maya: "Láak’." },
+		{ spanish: "Devoción", maya: "Yaakunaj óol." },
+		{ spanish: "Devolver", maya: "Suut." },
+		{ spanish: "Devorar", maya: "Luuk’, jáanjan janal, táats’ luuk’." },
+		{ spanish: "Día", maya: "K’iin." },
+		{ spanish: "Diabetes", maya: "Ch’ujuk k’i’ik, ch’ujuk wiix." },
+		{ spanish: "Diablo", maya: "Ba’aba’al, kisin, k’aak’as ba’al xulub." },
+		{ spanish: "Dialecto", maya: "U jela’anil t’aan ku síijil ti’ u na’ t’aan." },
+		{ spanish: "Diálogo", maya: "Tsikbal ich ka’atúul máako’ob." },
+		{ spanish: "Diamante", maya: "Jats’uts sak tuun ku léembal" },
+		{ spanish: "Diario", maya: "Sáansamal." },
+		{ spanish: "Diarrea", maya: "Waach’, wach’k’ajal, k’áaxil, tirix ta’." },
+		{ spanish: "Dibujar", maya: "U ts’íibta’al wáa u bo’onol u yoochel hunp’éel ba’al." },
+		{ spanish: "Dicha", maya: "Ki’imak óolal." },
+		{ spanish: "Dichoso", maya: "Ki’ óol." },
+		{ spanish: "Diente", maya: "Koj." },
+		{ spanish: "Dieta", maya: "P’is janal, p’íit janal." },
+		{ spanish: "Difamar", maya: "A’al ba’al." },
+		{ spanish: "Diferencia", maya: "Jela’anil." },
+		{ spanish: "Diferente", maya: "Jela’an, jejeláas, yaanal." },
+		{ spanish: "Difícil", maya: "Yaaj, talam." },
+		{ spanish: "Difunto", maya: "Kimen." },
+		{ spanish: "Digerir", maya: "Tajal janal, tajal o’och, éemel o’och." },
+		{ spanish: "Digestión", maya: "Tajal janal, tajal o’och." },
+		{ spanish: "Digno", maya: "Tsikbe’en." },
+		{ spanish: "Diligente", maya: "Sáak’óol, t’a’aj." },
+		{ spanish: "Diluir", maya: "Puuk’ yaach’." },
+		{ spanish: "Diluvio", maya: "Búulul, bulkabal." },
+		{ spanish: "Dimisión", maya: "P’aat." },
+		{ spanish: "Dimitir", maya: "P’aat." },
+		{ spanish: "Dinamita", maya: "Waak’, ba’al ku" },
+		{ spanish: "Dinastía", maya: "Ch’i’ibal." },
+		{ spanish: "Dinero", maya: "Taak’in." },
+		{ spanish: "Dios", maya: "K’uj, yuumtsil, ki’ichkelem yuum." },
+		{ spanish: "Dirección", maya: "U beil, u bejil." },
+		{ spanish: "Directo", maya: "Toj, taats’." },
+		{ spanish: "Discordia", maya: "Takal t’aan." },
+		{ spanish: "Discurso", maya: "Tse’ek." },
+		{ spanish: "Discutir", maya: "Ba’ate’el t’aan, sakach t’aan." },
+		{ spanish: "Disentería", maya: "K’i’ik’ nak’, k’i’ik’ ta’." },
+		{ spanish: "Disfrazar", maya: "Jelbes, jeel." },
+		{ spanish: "Disgustar", maya: "K’uux, k’uuxil, ts’íikil, p’u’ujul." },
+		{ spanish: "Disgusto", maya: "K’uux, ch’a’ k’uux." },
+		{ spanish: "Disimular", maya: "Ta’ak, mak chi’." },
+		{ spanish: "Disipar", maya: "Sa’atal, xuup, xu’upul." },
+		{ spanish: "Dislocar", maya: "Juuk’, tuuk’." },
+		{ spanish: "Disminuir", maya: "Chichankuun, tsaapajal, mina’ankuun." },
+		{ spanish: "Disolver", maya: "Puuk’, yiib." },
+		{ spanish: "Disparar", maya: "Wak’ ts’oon, ts’oon" },
+		{ spanish: "Disparo", maya: "Ts’oon." },
+		{ spanish: "Dispersar", maya: "K’iit, k’itpajal, pa’" },
+		{ spanish: "Disputa", maya: "Ba’ate’el, ba’ate’il." },
+		{ spanish: "Distancia", maya: "Náachil, yáam." },
+		{ spanish: "Distante", maya: "Náach." },
+		{ spanish: "Distinguir", maya: "K’aj óol, il; téet, yéey." },
+		{ spanish: "Distinto", maya: "Jela’an, yaanal, k’expaja’an." },
+		{ spanish: "Distracción", maya: "Nay óolal." },
+		{ spanish: "Distraer", maya: "Náay óol." },
+		{ spanish: "Diurno", maya: "Ich k’iin." },
+		{ spanish: "Diversión", maya: "Cha’an, báaxal." },
+		{ spanish: "Diverso", maya: "jejeláas, jela’an" },
+		{ spanish: "Divertir", maya: "Ki’imakkun óol, náays óol." },
+		{ spanish: "Dividir", maya: "T’oox, jaats, buj, xoot’." },
+		{ spanish: "Divisar", maya: "Iil." },
+		{ spanish: "División", maya: "K’áas." },
+		{ spanish: "Divorciar", maya: "P’aat, p’atba." },
+		{ spanish: "Divorcio", maya: "P’aat, p’atba" },
+		{ spanish: "Divulgar", maya: "Ts’aa ojéetbil, men ojéetbil." },
+		{ spanish: "Dobladillo", maya: "Biil, biilil." },
+		{ spanish: "Doblar", maya: "Wuuts’." },
+		{ spanish: "Doblez", maya: "Waats’, wuuts’, wuuts’ul." },
+		{ spanish: "Docencia", maya: "Kaansaj, kaambesaj." },
+		{ spanish: "Docente", maya: "Máax ku kaansaj, máax ku kaambesaj." },
+		{ spanish: "Dócil", maya: "Suuk, suuka’an." },
+		{ spanish: "Doctor", maya: "May ku ts’aak k’oja’an." },
+		{ spanish: "Doler", maya: "Yaaj, chi’ibal, k’i’inam." },
+		{ spanish: "Dolor", maya: "Yaaj, chi’ibal, k’i’inam." },
+		{ spanish: "Domar", maya: "Sukkin ba’alche’o’ob." },
+		{ spanish: "Domesticar", maya: "Alak’t, suukkin." },
+		{ spanish: "Domicilio", maya: "Naj, taanaj, otoch" },
+		{ spanish: "Donar", maya: "Síi, ts’aa." },
+		{ spanish: "Doncel", maya: "Táankelem, táankelen." },
+		{ spanish: "Doncella", maya: "Suujuy, xlo’bayan, xlo’bayen, ch’úupal." },
+		{ spanish: "Dónde", maya: "Tu’ux." },
+		{ spanish: "Dormir", maya: "Wenel, wenej. ." },
+		{ spanish: "Dormitorio", maya: "U najil wenel." },
+		{ spanish: "Dorso", maya: "Paach, pu’uch." },
+		{ spanish: "Dos", maya: "Ka’." },
+		{ spanish: "Dote", maya: "Mu’ujul." },
+		{ spanish: "Duda", maya: "Péek óol." },
+		{ spanish: "Duende", maya: "Alux, arux" },
+		{ spanish: "Dulce", maya: "Ch’ujuk." },
+		{ spanish: "Duplicar", maya: "Uka’ meenta’al junp’éel ba’al. U meenta’al ka’atéen junp’éel ba’al." },
+		{ spanish: "Durar", maya: "Xáantal, úuchbental." },
+		{ spanish: "Durmiente", maya: "Wenekbal" },
+		{ spanish: "Duro", maya: "Chich, chuchul, ts’u’uy." }
+
+        ];
+
+        // Función para capitalizar solo la primera letra.
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        }
+
+        // Función principal para renderizar la lista
+        function renderDictionary() {
+            const listContainer = document.getElementById('dictionary-list');
+            listContainer.innerHTML = ''; // Limpiar el mensaje de carga
+
+            DICTIONARY_DATA.forEach((item, index) => {
+                const spanishWord = capitalizeFirstLetter(item.spanish);
+
+                // 1. Creación de la tarjeta/elemento de definición
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 sm:p-5 rounded-xl shadow-lg hover:shadow-xl transition-shadow card-divider';
+                
+                // 2. Palabra en español (clickeable)
+                const spanishEl = document.createElement('h2');
+                // Añadimos un ID único para poder vincular la definición a este elemento.
+                spanishEl.id = `word-${index}`; 
+                spanishEl.className = 'spanish-word text-xl sm:text-2xl font-extrabold mb-1 select-none'; // select-none evita que el texto se seleccione al hacer clic
+                spanishEl.textContent = spanishWord;
+
+                // 3. Contenedor de la definición en maya (Inicialmente oculta)
+                const mayaContainer = document.createElement('div');
+                // Clase CSS para ocultar/mostrar con animación
+                mayaContainer.className = 'maya-definition'; 
+                mayaContainer.id = `definition-${index}`;
+
+                // 4. Contenido de la definición
+                const mayaEl = document.createElement('p');
+                mayaEl.className = 'text-base sm:text-lg text-text-primary leading-relaxed';
+                mayaEl.textContent = item.maya;
+                
+                // 5. Armar la definición dentro del contenedor
+                mayaContainer.appendChild(mayaEl);
+
+                // 6. Configurar el evento de click en la palabra en español
+                spanishEl.addEventListener('click', () => {
+                    // Alternar la clase 'visible' para mostrar u ocultar la definición
+                    mayaContainer.classList.toggle('visible');
+
+                    // Opcional: Ocultar todas las demás definiciones abiertas
+                    // document.querySelectorAll('.maya-definition.visible').forEach(def => {
+                    //     if (def.id !== mayaContainer.id) {
+                    //         def.classList.remove('visible');
+                    //     }
+                    // });
+                });
+
+                // 7. Armar la tarjeta completa
+                card.appendChild(spanishEl);
+                // El separador se moverá justo antes del contenido en maya visible
+                const divider = document.createElement('div');
+                divider.className = 'w-10 h-0.5 bg-maya-gray/50 mb-1 rounded-full';
+                
+                // Se coloca el separador dentro del contenedor oculto/visible para que aparezca con la definición.
+                mayaContainer.prepend(divider); 
+                
+                card.appendChild(mayaContainer);
+
+                listContainer.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDictionary);
+
+    </script>
+</body>
+</html>

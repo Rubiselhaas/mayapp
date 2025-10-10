@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MayApp - Letra F</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Definición de la paleta de colores en CSS para usar en JS y como utilidad */
+        :root {
+            --color-maroon: #9F2241;
+            --color-khaki: #BCA986;
+            --color-green: #235B4E;
+            --color-gray: #888B8D;
+            --color-text-primary: #1F2937; /* Darker text for readability */
+        }
+        
+        /* Configuración de Tailwind para usar las variables de color */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'maya-maroon': 'var(--color-maroon)',
+                        'maya-khaki': 'var(--color-khaki)',
+                        'maya-green': 'var(--color-green)',
+                        'maya-gray': 'var(--color-gray)',
+                        'text-primary': 'var(--color-text-primary)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+
+        /* Estilo base para asegurar que la fuente Inter se aplique */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        /* Estilos del encabezado */
+        .header-bg {
+            background-color: var(--color-maroon);
+        }
+        .header-text {
+            color: var(--color-khaki);
+        }
+
+        /* Estilo para la palabra en español (clickable) */
+        .spanish-word {
+            color: var(--color-green);
+            cursor: pointer; /* Indica que es clickeable */
+            transition: color 0.2s ease-in-out;
+        }
+        .spanish-word:hover {
+            color: #1A473C; /* Un verde un poco más oscuro al pasar el ratón */
+        }
+
+        /* CLASE PARA LA DEFINICIÓN OCULTA */
+        .maya-definition {
+            max-height: 0; /* Inicialmente oculto */
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        /* CLASE PARA LA DEFINICIÓN VISIBLE */
+        .maya-definition.visible {
+            max-height: 100px; /* Suficientemente grande para contener la definición */
+            opacity: 1;
+            margin-top: 0.5rem; /* Pequeño margen superior al mostrar */
+        }
+        
+        /* Estilo para el separador o borde de los elementos */
+        .card-divider {
+            border-bottom: 1px solid var(--color-gray);
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- Encabezado Fijo -->
+    <header class="header-bg shadow-lg sticky top-0 z-10 rounded-b-xl">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="header-text text-xl sm:text-2xl font-bold tracking-wider">
+                MayApp - Diccionario maya
+            </h1>
+            <span class="bg-maya-khaki text-maya-maroon px-3 py-1 text-sm font-semibold rounded-full shadow-md">
+                Letra F
+            </span>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal de la Lista -->
+    <main class="max-w-4xl mx-auto p-4 pt-8">
+        <div id="dictionary-list" class="space-y-4">
+            <!-- Las tarjetas del diccionario se renderizarán aquí -->
+            <div class="text-center p-8 text-maya-gray">Cargando palabras...</div>
+        </div>
+    </main>
+
+    <!-- Pie de página discreto -->
+    <footer class="mt-12 py-4 bg-gray-100 text-center text-xs text-maya-gray border-t border-maya-gray/30">
+        <p>Proyecto de Lengua y Cultura Maya. Haz clic en la palabra en español para ver la traducción.</p>
+    </footer>
+
+    <script>
+        // Datos del diccionario actualizados del documento 'A [actualizado].docx', corregidos hasta AZUZAR.
+        // Formato: { spanish: "Palabra Española", maya: "DEFINICIÓN EN MAYA" }
+        const DICTIONARY_DATA = [
+            
+		{ spanish: "Fábrica", maya: "U kúuchil u meenta’al ba’alo’ob" },
+		{ spanish: "Fabricar", maya: "Meen, beet" },
+		{ spanish: "Fácil", maya: "Chéen ch’a’abil, ma’ talami’, ma’ yaji’" },
+		{ spanish: "Faena", maya: "Meyaj" },
+		{ spanish: "Faisán", maya: "K’anbul" },
+		{ spanish: "Faja", maya: "K’ax nak" },
+		{ spanish: "Falo", maya: "Keep, toon" },
+		{ spanish: "Falso", maya: "Ma’ jaaji’, tuus" },
+		{ spanish: "Faltar", maya: "Si’ip" },
+		{ spanish: "Fama", maya: "Péektsil, péeksil" },
+		{ spanish: "Familia", maya: "Ch’i’ibalil, láak’tsilil" },
+		{ spanish: "Fantasía", maya: "Tuukul máak" },
+		{ spanish: "Fantasma", maya: "Wáay, ba’aba’al, ja’as óol" },
+		{ spanish: "Fardo", maya: "Kúuch" },
+		{ spanish: "Faringe", maya: "Úul" },
+		{ spanish: "Fastidiar", maya: "Náaks óol, naks óol" },
+		{ spanish: "Fatiga", maya: "Ka’anal" },
+		{ spanish: "Fatigado", maya: "Ka’ana’an" },
+		{ spanish: "Fauna", maya: "Ba’alche’il, ba’alche’o’ob" },
+		{ spanish: "Favor", maya: "Áant, áantaj, men uuts" },
+		{ spanish: "Fécula", maya: "Nooy" },
+		{ spanish: "Fecundar", maya: "Cheek’, cheek’s" },
+		{ spanish: "Fecha", maya: "K’iin, k’iinil" },
+		{ spanish: "Felicidad", maya: "Ki’imak óolal" },
+		{ spanish: "Feliz", maya: "Ki’imak óol" },
+		{ spanish: "Femenino", maya: "Xch’up, ch’upil" },
+		{ spanish: "Feo", maya: "K’aas" },
+		{ spanish: "Feria", maya: "Cha’an" },
+		{ spanish: "Fermentar", maya: "Yóomtal, pajtal, su’uts’tal" },
+		{ spanish: "Feroz", maya: "Ts’íik" },
+		{ spanish: "Fértil", maya: "Ya’ab u ts’aik u yich wáa u yaal" },
+		{ spanish: "Fetiche", maya: "Póolbil che’" },
+		{ spanish: "Feto", maya: "Chan paal ma’ síijki’" },
+		{ spanish: "Fiado", maya: "P’aax" },
+		{ spanish: "Fiar", maya: "P’aax" },
+		{ spanish: "Fibra", maya: "Sook’, so’ok’" },
+		{ spanish: "Fiebre", maya: "Chokwil" },
+		{ spanish: "Fiera", maya: "Ts’iik ba’alche’" },
+		{ spanish: "Fiesta", maya: "Cha’an, máank’inal" },
+		{ spanish: "Figura", maya: "Oochel" },
+		{ spanish: "Fijar", maya: "Taak’, jeets’, akkun" },
+		{ spanish: "Fila", maya: "Tsool, t’o’ol" },
+		{ spanish: "Filo", maya: "Yeej" },
+		{ spanish: "Filtrar", maya: "T’ooj, t’aaj, ch’aaj, ts’iib" },
+		{ spanish: "Fin", maya: "Xuul, ts’ook, naak" },
+		{ spanish: "Finado", maya: "Kimen" },
+		{ spanish: "Final", maya: "Ts’ook, xuul" },
+		{ spanish: "Finca", maya: "Xtansia" },
+		{ spanish: "Fingir", maya: "Tuus" },
+		{ spanish: "Fino", maya: "Mamaykil, mamaykil" },
+		{ spanish: "Firmamento", maya: "Chuun ka’an" },
+		{ spanish: "Firmar", maya: "Joron ts’íib, jojon ts’íib" },
+		{ spanish: "Firme", maya: "Chich, ma’alob taak’li" },
+		{ spanish: "Flaco", maya: "Ts’ooy, ts’oya’an, bek’ech, cholo’op" },
+		{ spanish: "Fleco", maya: "Piik" },
+		{ spanish: "Flema", maya: "K’aab chi’, yóom chi’" },
+		{ spanish: "Flexible", maya: "Wuts’k’alak, wuwuts’ki, ma’ chichi’" },
+		{ spanish: "Flojo", maya: "Ma’kóol, jooykep, meelen keep, jooypel, meelen peel" },
+		{ spanish: "Flor", maya: "Lool, nikte’" },
+		{ spanish: "Flora", maya: "K’aaxil, che’o’ob" },
+		{ spanish: "Floración", maya: "Loolankil, nikte’il" },
+		{ spanish: "Flotar", maya: "K’ak’aknak, báab" },
+		{ spanish: "Fluir", maya: "Áalkab, jóok’ol, wéekel" },
+		{ spanish: "Fobia", maya: "Sajkil" },
+		{ spanish: "Fogaje", maya: "K’aak’" },
+		{ spanish: "Fogata", maya: "Ka’anal k’áak’, k’áak’ ku jojopaankil" },
+		{ spanish: "Fogón", maya: "K’óoben, k’óoben k’áak’, chi’ k’áak’" },
+		{ spanish: "Folklore", maya: "Ba’axo’ob suuk u meentik junp’éel kaaj" },
+		{ spanish: "Fonda", maya: "Naj tu’ux ku ko’onol janal" },
+		{ spanish: "Fondo", maya: "Iit" },
+		{ spanish: "Foráneo", maya: "Táanxel kaajil" },
+		{ spanish: "Forastero", maya: "Táanxelil" },
+		{ spanish: "Forma", maya: "Wíinkil" },
+		{ spanish: "Formar", maya: "Paat" },
+		{ spanish: "Forraje", maya: "Yo’och ba’alche’o’ob" },
+		{ spanish: "Forrar", maya: "Piix" },
+		{ spanish: "Forro", maya: "Piix, yáal" },
+		{ spanish: "Fortaleza", maya: "Muuk’, chich" },
+		{ spanish: "Fosa", maya: "Mok’och, jool" },
+		{ spanish: "Fósforo", maya: "Jiri’ich joop" },
+		{ spanish: "Fósil", maya: "Úuchben baako’ob wáa sóolo’ob kimen máako’ob wáa ba’alche’o’ob" },
+		{ spanish: "Fracasar", maya: "Bin k’aas ti’ máak" },
+		{ spanish: "Fractura", maya: "Kaach" },
+		{ spanish: "Fracturar", maya: "Kaach, káachal, teej, téejel" },
+		{ spanish: "Fragancia", maya: "Ki’ibokil" },
+		{ spanish: "Frágil", maya: "Kakachki, o’op’ki, op’chalak, op’k’alak" },
+		{ spanish: "Fragmento", maya: "Xéet, xéet’el, káach, xoot" },
+		{ spanish: "Fraude", maya: "Ookol, tuus, balk’ab" },
+		{ spanish: "Freír", maya: "Tsaaj" },
+		{ spanish: "Frenillo", maya: "T’iin aak’" },
+		{ spanish: "Frente", maya: "Táan, aktáan, táan pool, táan jo’ol" },
+		{ spanish: "Fresco", maya: "Áak’, túumben, siis, che’che’, tulup" },
+		{ spanish: "Friega", maya: "Toop" },
+		{ spanish: "Frijol", maya: "Bu’ul" },
+		{ spanish: "Frío", maya: "Ke’el, síis" },
+		{ spanish: "Frontera", maya: "Xuul, xuul u lu’umil junp’éel kaaj" },
+		{ spanish: "Frotar", maya: "Ji’, jaax, xu’ul" },
+		{ spanish: "Fruncir", maya: "Ch’uuk, meek, chaak’" },
+		{ spanish: "Frustrar", maya: "Luk’s, toop, p’at k’aasi" },
+		{ spanish: "Fruta", maya: "Ich" },
+		{ spanish: "Fruto", maya: "Ich" },
+		{ spanish: "Fuego", maya: "K’áak’" },
+		{ spanish: "Fuente", maya: "Sayab" },
+		{ spanish: "Fuera", maya: "Paach, paachil, táankab" },
+		{ spanish: "Fuerte", maya: "Mu’k’a’an, chichja’an, t’at’ajkl" },
+		{ spanish: "Fuerza", maya: "Muuk’" },
+		{ spanish: "Fuga", maya: "Púuts’ul" },
+		{ spanish: "Fumar", maya: "Ts’u’uts’" },
+		{ spanish: "Funda", maya: "Piix" },
+		{ spanish: "Fundador", maya: "Kajkunaj" },
+		{ spanish: "Fundar", maya: "Aktal, chúunpajal, káajal, kajkunaj" },
+		{ spanish: "Fúnebre", maya: "Kimenil" },
+		{ spanish: "Fusil", maya: "Ts’oon" },
+		{ spanish: "Fusilar", maya: "Ts’oon" },
+		{ spanish: "Fustán", maya: "Piik" },
+		{ spanish: "Futbol", maya: "Kóocha’ wóolis" },
+		{ spanish: "Futuro", maya: "Bíin úuchuk" }
+
+        ];
+
+        // Función para capitalizar solo la primera letra.
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        }
+
+        // Función principal para renderizar la lista
+        function renderDictionary() {
+            const listContainer = document.getElementById('dictionary-list');
+            listContainer.innerHTML = ''; // Limpiar el mensaje de carga
+
+            DICTIONARY_DATA.forEach((item, index) => {
+                const spanishWord = capitalizeFirstLetter(item.spanish);
+
+                // 1. Creación de la tarjeta/elemento de definición
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 sm:p-5 rounded-xl shadow-lg hover:shadow-xl transition-shadow card-divider';
+                
+                // 2. Palabra en español (clickeable)
+                const spanishEl = document.createElement('h2');
+                // Añadimos un ID único para poder vincular la definición a este elemento.
+                spanishEl.id = `word-${index}`; 
+                spanishEl.className = 'spanish-word text-xl sm:text-2xl font-extrabold mb-1 select-none'; // select-none evita que el texto se seleccione al hacer clic
+                spanishEl.textContent = spanishWord;
+
+                // 3. Contenedor de la definición en maya (Inicialmente oculta)
+                const mayaContainer = document.createElement('div');
+                // Clase CSS para ocultar/mostrar con animación
+                mayaContainer.className = 'maya-definition'; 
+                mayaContainer.id = `definition-${index}`;
+
+                // 4. Contenido de la definición
+                const mayaEl = document.createElement('p');
+                mayaEl.className = 'text-base sm:text-lg text-text-primary leading-relaxed';
+                mayaEl.textContent = item.maya;
+                
+                // 5. Armar la definición dentro del contenedor
+                mayaContainer.appendChild(mayaEl);
+
+                // 6. Configurar el evento de click en la palabra en español
+                spanishEl.addEventListener('click', () => {
+                    // Alternar la clase 'visible' para mostrar u ocultar la definición
+                    mayaContainer.classList.toggle('visible');
+
+                    // Opcional: Ocultar todas las demás definiciones abiertas
+                    // document.querySelectorAll('.maya-definition.visible').forEach(def => {
+                    //     if (def.id !== mayaContainer.id) {
+                    //         def.classList.remove('visible');
+                    //     }
+                    // });
+                });
+
+                // 7. Armar la tarjeta completa
+                card.appendChild(spanishEl);
+                // El separador se moverá justo antes del contenido en maya visible
+                const divider = document.createElement('div');
+                divider.className = 'w-10 h-0.5 bg-maya-gray/50 mb-1 rounded-full';
+                
+                // Se coloca el separador dentro del contenedor oculto/visible para que aparezca con la definición.
+                mayaContainer.prepend(divider); 
+                
+                card.appendChild(mayaContainer);
+
+                listContainer.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDictionary);
+
+    </script>
+</body>
+</html>

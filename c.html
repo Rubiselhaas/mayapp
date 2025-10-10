@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MayApp - Letra C</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Definición de la paleta de colores en CSS para usar en JS y como utilidad */
+        :root {
+            --color-maroon: #9F2241;
+            --color-khaki: #BCA986;
+            --color-green: #235B4E;
+            --color-gray: #888B8D;
+            --color-text-primary: #1F2937; /* Darker text for readability */
+        }
+        
+        /* Configuración de Tailwind para usar las variables de color */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'maya-maroon': 'var(--color-maroon)',
+                        'maya-khaki': 'var(--color-khaki)',
+                        'maya-green': 'var(--color-green)',
+                        'maya-gray': 'var(--color-gray)',
+                        'text-primary': 'var(--color-text-primary)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+
+        /* Estilo base para asegurar que la fuente Inter se aplique */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        /* Estilos del encabezado */
+        .header-bg {
+            background-color: var(--color-maroon);
+        }
+        .header-text {
+            color: var(--color-khaki);
+        }
+
+        /* Estilo para la palabra en español (clickable) */
+        .spanish-word {
+            color: var(--color-green);
+            cursor: pointer; /* Indica que es clickeable */
+            transition: color 0.2s ease-in-out;
+        }
+        .spanish-word:hover {
+            color: #1A473C; /* Un verde un poco más oscuro al pasar el ratón */
+        }
+
+        /* CLASE PARA LA DEFINICIÓN OCULTA */
+        .maya-definition {
+            max-height: 0; /* Inicialmente oculto */
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        /* CLASE PARA LA DEFINICIÓN VISIBLE */
+        .maya-definition.visible {
+            max-height: 100px; /* Suficientemente grande para contener la definición */
+            opacity: 1;
+            margin-top: 0.5rem; /* Pequeño margen superior al mostrar */
+        }
+        
+        /* Estilo para el separador o borde de los elementos */
+        .card-divider {
+            border-bottom: 1px solid var(--color-gray);
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- Encabezado Fijo -->
+    <header class="header-bg shadow-lg sticky top-0 z-10 rounded-b-xl">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="header-text text-xl sm:text-2xl font-bold tracking-wider">
+                MayApp - Diccionario maya
+            </h1>
+            <span class="bg-maya-khaki text-maya-maroon px-3 py-1 text-sm font-semibold rounded-full shadow-md">
+                Letra C
+            </span>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal de la Lista -->
+    <main class="max-w-4xl mx-auto p-4 pt-8">
+        <div id="dictionary-list" class="space-y-4">
+            <!-- Las tarjetas del diccionario se renderizarán aquí -->
+            <div class="text-center p-8 text-maya-gray">Cargando palabras...</div>
+        </div>
+    </main>
+
+    <!-- Pie de página discreto -->
+    <footer class="mt-12 py-4 bg-gray-100 text-center text-xs text-maya-gray border-t border-maya-gray/30">
+        <p>Proyecto de Lengua y Cultura Maya. Haz clic en la palabra en español para ver la traducción.</p>
+    </footer>
+
+    <script>
+        // Datos del diccionario actualizados del documento 'A [actualizado].docx', corregidos hasta AZUZAR.
+        // Formato: { spanish: "Palabra Española", maya: "DEFINICIÓN EN MAYA" }
+        const DICTIONARY_DATA = [
+            
+{ spanish: "CABAL", maya: "Chuka’an, chúuka’an, p’elech." },
+		{ spanish: "CABALGAR", maya: "Nat’ tsíimin, xiimbal yóok’ol tsíimin." },
+		{ spanish: "CABALLERO", maya: "Ts’uul." },
+		{ spanish: "CABALLETE", maya: "Jo’ol naj che’." },
+		{ spanish: "CABALLO", maya: "Tsíimin." },
+		{ spanish: "CABAÑA", maya: "Paasel." },
+		{ spanish: "CABAÑUELAS", maya: "Xok k’iin." },
+		{ spanish: "CABARET", maya: "U najil tu’ux ku káaltal yéetel ku yóok’ot máak." },
+		{ spanish: "CABECILLA", maya: "Poolil, jo’olil." },
+		{ spanish: "CABELLO", maya: "Tso’otsel pool, tso’otsel jo’ol." },
+		{ spanish: "CABER", maya: "Je’ u páajtal u yokol ti’ uláak’ ba’ale’." },
+		{ spanish: "CABEZA", maya: "Pool, jo’ol." },
+		{ spanish: "CABO", maya: "Jo’ol, ni’, iit, xuul, ts’ook, yala’." },
+		{ spanish: "CACA", maya: "Ta’." },
+		{ spanish: "CACAO", maya: "Kakaw." },
+		{ spanish: "CACAREAR", maya: "Totojk’e’." },
+		{ spanish: "CACERIA", maya: "Ts’oon, p’uuj." },
+		{ spanish: "CACIQUE", maya: "Jalach wíinik, tatich, batab." },
+		{ spanish: "CACHETADA", maya: "Pe’ laj, pa’ laj." },
+		{ spanish: "CACHETE", maya: "P’u’uk." },
+		{ spanish: "CACHORRO", maya: "Aal, mejenil." },
+		{ spanish: "CACHUCHA", maya: "P’óok." },
+		{ spanish: "CADÁVER", maya: "Kimen." },
+		{ spanish: "CADERA", maya: "T’eet’." },
+		{ spanish: "CADUCAR", maya: "Úuchbental, ch’iijil," },
+		{ spanish: "CAER", maya: "Lúubul, báanal, júutul." },
+		{ spanish: "CAFÉ", maya: "Káapej." },
+		{ spanish: "CAGALERA", maya: "Wach’ iit, k’áaxil." },
+		{ spanish: "CAGAR", maya: "Ta’" },
+		{ spanish: "CAIMÁN", maya: "Áain, áayin." },
+		{ spanish: "CAJA", maya: "Máaben, ba’as." },
+		{ spanish: "CAJETE", maya: "Lak, k’at." },
+		{ spanish: "CAJÓN", maya: "Máaben." },
+		{ spanish: "CAL", maya: "Ta’an." },
+		{ spanish: "CALABAZA", maya: "K’úum, (x)ka’." },
+		{ spanish: "CALABAZO", maya: "Chúuj." },
+		{ spanish: "CALABOZO", maya: "k’alab che’, k’alab máaskab." },
+		{ spanish: "CALAMBRE", maya: "Lot’ kéej." },
+		{ spanish: "CALAMIDAD", maya: "Noj yaj." },
+		{ spanish: "CALANDRIA", maya: "Sak chik." },
+		{ spanish: "CALAR", maya: "K’uup, jáat k’up." },
+		{ spanish: "CALAVERA", maya: "Baakel pool." },
+		{ spanish: "CALCAÑAL", maya: "Tuunkuy." },
+		{ spanish: "CALCAÑAR", maya: "Tuunkuy" },
+		{ spanish: "CALCE", maya: "No’ox." },
+		{ spanish: "CALCINAR", maya: "Ta’ant." },
+		{ spanish: "CÁLCULO", maya: "Mejen tuunich ku yantal tu beel u wiix máak." },
+		{ spanish: "CALDO", maya: "K’aab, ja’il." },
+		{ spanish: "CALENTAR", maya: "K’íin, chokokiin." },
+		{ spanish: "CALENTURA", maya: "Chokwil, chokwij" },
+		{ spanish: "CÁLIDO", maya: "Chokoj." },
+		{ spanish: "CALIENTE", maya: "Chokoj." },
+		{ spanish: "CALMA", maya: "Kukupkij, jeets’." },
+		{ spanish: "CALMAR", maya: "Jeets’ kuup, ch’een." },
+		{ spanish: "CALOR", maya: "Ooxol." },
+		{ spanish: "CALOSTRO", maya: "Yáax k’aab yiim ko’olel wáa ch’upi ba’alche’ ku ts’aik ti’ u yaal." },
+		{ spanish: "CALUMNIA", maya: "Líik’saj t’aan, a’al ba’al, a’al t’aan." },
+		{ spanish: "CALUMNIAR", maya: "Líik’saj t’aan, a’al ba’al." },
+		{ spanish: "CALVO", maya: "K’olis, t’ooroch." },
+		{ spanish: "CALZADO", maya: "Xanab." },
+		{ spanish: "CALZAR", maya: "Ts’aa xanab, taak’ xanab." },
+		{ spanish: "CALZÓN", maya: "Eex." },
+		{ spanish: "CALZONCILLO", maya: "Kul eex." },
+		{ spanish: "CALLAR", maya: "Mak chi’" },
+		{ spanish: "CALLE", maya: "Beel." },
+		{ spanish: "CALLO", maya: "T’aajam." },
+		{ spanish: "CAMADA", maya: "Pakab." },
+		{ spanish: "CAMBIAR", maya: "Jeel, k’eex." },
+		{ spanish: "CAMBIO", maya: "Jeel, k’eex." },
+		{ spanish: "CAMINAR", maya: "Xíimbal, xíinbaj," },
+		{ spanish: "CAMINO", maya: "Beel, bej." },
+		{ spanish: "CAMISA", maya: "Kóoton." },
+		{ spanish: "CAMOTE", maya: "Iis." },
+		{ spanish: "CAMPESINO", maya: "(j)Kol náak, (x)kol náal." },
+		{ spanish: "CAMPO", maya: "K’áax." },
+		{ spanish: "CANA", maya: "Sak tso’ots, sak pool." },
+		{ spanish: "CANASTA", maya: "Xaak, xúuxak." },
+		{ spanish: "CANASTO", maya: "Xúux, xúuxak." },
+		{ spanish: "CANCIÓN", maya: "K’aay." },
+		{ spanish: "CANCHA", maya: "U kúuchil u báaxta’al ‘boola’ wáa wóolis." },
+		{ spanish: "CANDELA", maya: "K’aak’." },
+		{ spanish: "CANÍBAL", maya: "Mak ku jaantik u yéet máakil." },
+		{ spanish: "CANINO", maya: "Peek’, peek’il." },
+		{ spanish: "CANJEAR", maya: "K’eex." },
+		{ spanish: "CANOA", maya: "Cheem" },
+		{ spanish: "CANSAR", maya: "Ka’anal." },
+		{ spanish: "CANTAR", maya: "K’aay" },
+		{ spanish: "CÁNTARO", maya: "P’úul." },
+		{ spanish: "CANTIDAD", maya: "Ya’ab, ya’abach, ya’abil, nojochil." },
+		{ spanish: "CANTIL", maya: "Wol poch’." },
+		{ spanish: "CANTINA", maya: "Kúuchil tu’ux ku ko’onol yéetel ku yu’uk’ul ba’al ku káalkuntik máak." },
+		{ spanish: "CANTO", maya: "K’aay" },
+		{ spanish: "CAÑA", maya: "Jíim, ch’ujuk jíim; jalal, sak’ab." },
+		{ spanish: "CÁÑAMO", maya: "K’uuch." },
+		{ spanish: "CAÑARROZA", maya: "Sak’ab kool." },
+		{ spanish: "CAÑO", maya: "Beel ja’" },
+		{ spanish: "CAOBA", maya: "Punab." },
+		{ spanish: "CAPA", maya: "Yáal." },
+		{ spanish: "CAPACITAR", maya: "Ka’ans, kaanbes." },
+		{ spanish: "CAPAR", maya: "U xo’otol u ye’el u keep ba’alche’ wáa máak" },
+		{ spanish: "CAPATAZ", maya: "mayol" },
+		{ spanish: "CAPITAL", maya: "Taak’in, noj kaaj" },
+		{ spanish: "CAPITÁN", maya: "Nojochil." },
+		{ spanish: "CAPÓN", maya: "Mina’an u ye’el u keep." },
+		{ spanish: "CAPULLO", maya: "Úuntulis, úunturis." },
+		{ spanish: "CARABINA", maya: "Ts’oon" },
+		{ spanish: "CARACOL", maya: "Juub; úurich." },
+		{ spanish: "CARAPACHO", maya: "Sóol, maak." },
+		{ spanish: "CARBÓN", maya: "Chúuk." },
+		{ spanish: "CARCAJADA", maya: "Che’ej, jaja’ che’ej, k’a’am che’ej." },
+		{ spanish: "CARCOMER", maya: "Néet, nóot’, níich’, biis, sib." },
+		{ spanish: "CARECER", maya: "Mina’an." },
+		{ spanish: "CARGA", maya: "Kuuch, k’óoch." },
+		{ spanish: "CARGAR", maya: "Kuuch, k’óoch." },
+		{ spanish: "CARGO", maya: "Kuuch" },
+		{ spanish: "CARICIA", maya: "Báay." },
+		{ spanish: "CARIDAD", maya: "Máatan, síij." },
+		{ spanish: "CARIES", maya: "Joolol koj, laab koj." },
+		{ spanish: "CARIÑO", maya: "Yaakun." },
+		{ spanish: "CARMÍN", maya: "Chak chak, jach chak, seen chak." },
+		{ spanish: "CÁRCEL", maya: "K’alab che’, k’alab máaskab." },
+		{ spanish: "CARDENAL", maya: "Chak ts’íits’ib." },
+		{ spanish: "CARDO", maya: "Múul." },
+		{ spanish: "CARNE", maya: "Bak’" },
+		{ spanish: "CARNERO", maya: "Taman." },
+		{ spanish: "CARNICERO", maya: "(J)kon bak’." },
+		{ spanish: "CARO", maya: "Ko’ok." },
+		{ spanish: "CARPINTERÍA", maya: "U kúuchil u meenta’al ba’alo’ob yéetel che’" },
+		{ spanish: "CARPINTERO", maya: "(J)Pool che’, (J)men ba’alo’ob, yéetel che’." },
+		{ spanish: "CARRERA", maya: "Áalkab." },
+		{ spanish: "CARRETERA", maya: "Bej, noj bej" },
+		{ spanish: "CARRILLO", maya: "Balak’" },
+		{ spanish: "CARRIZO", maya: "Jalal." },
+		{ spanish: "CARTA", maya: "Ts’iibil ju’un." },
+		{ spanish: "CARTÍLAGO", maya: "Muun bak, muumun bak." },
+		{ spanish: "CARTUCHO", maya: "Yóol ts’oon." },
+		{ spanish: "CASA", maya: "Naj, taanaj, otoch." },
+		{ spanish: "CASAMIENTO", maya: "Ts’o’okol beel." },
+		{ spanish: "CASAR", maya: "Ts’o’okol beel." },
+		{ spanish: "CASCABEL", maya: "Tsáab kaan." },
+		{ spanish: "CÁSCARA", maya: "Paach, sóol," },
+		{ spanish: "CASCARÓN", maya: "Sóol je’." },
+		{ spanish: "CASCO", maya: "Maay." },
+		{ spanish: "CASI", maya: "Óolak, óoli’, ta’aytak, k’as" },
+		{ spanish: "CASPA", maya: "Ta’ pool." },
+		{ spanish: "CASTA", maya: "Ch’i’ibal." },
+		{ spanish: "CASTELLANO", maya: "Káastlan, káastran." },
+		{ spanish: "CASTIGAR", maya: "Jaats’, toop." },
+		{ spanish: "CASTILLO", maya: "Nukuch naj." },
+		{ spanish: "CASTRAR", maya: "U tse’elel u ye’el u keep ba’alche’ wáa xiib." },
+		{ spanish: "CATAR", maya: "Túunt." },
+		{ spanish: "CATARATA", maya: "Sak t’aj, buy ich" },
+		{ spanish: "CATARRO", maya: "Se’en." },
+		{ spanish: "CATÁSTROFE", maya: "Loob." },
+		{ spanish: "CÁTEDRA", maya: "Kaans, kaanbes." },
+		{ spanish: "CAVERNA", maya: "Áaktun, sajkab." },
+		{ spanish: "CAZA", maya: "Ts’oon, chuuk." },
+		{ spanish: "CAZADOR", maya: "Máak ku bin ts’oon, p’uuj wáa chuuk." },
+		{ spanish: "CAZAR", maya: "Ts’oon, p’uul, chuuk." },
+		{ spanish: "CEBAR", maya: "Tséen, polokkin, polokkun." },
+		{ spanish: "CEBÚ", maya: "Wakax yan u p’uus." },
+		{ spanish: "CEDRO", maya: "K’u’che’." },
+		{ spanish: "CEGAR", maya: "Ch’óopchajal, ch’óopkin." },
+		{ spanish: "CEGUERA", maya: "Ch’óopil, ch’óoptal." },
+		{ spanish: "CEIBA", maya: "Ya’axche’." },
+		{ spanish: "CEJA", maya: "Mojton." },
+		{ spanish: "CELESTE", maya: "Ka’an." },
+		{ spanish: "CÉLIBE", maya: "Ma’ ts’oka’an u beeli’." },
+		{ spanish: "CEMENTERIO", maya: "Kúuchil tu’ux ku mu’ukul kimeno’ob." },
+		{ spanish: "CENA", maya: "Ook’in janal." },
+		{ spanish: "CENAR", maya: "U janal máak oka’an k’iin." },
+		{ spanish: "CENIT", maya: "Chúumuk ka’an, chúumuk k’iin." },
+		{ spanish: "CENIZA", maya: "Ta’an." },
+		{ spanish: "CENOTE", maya: "Ts’ono’ot." },
+		{ spanish: "CENTINELA", maya: "May ku kalan" },
+		{ spanish: "CENTRAR", maya: "Ts’aa chúumuk wáa ba’ax" },
+		{ spanish: "CENTRO", maya: "Chúumuk, táan chumuk, ts’u’." },
+		{ spanish: "CENZONTLE", maya: "Sak chik." },
+		{ spanish: "CEÑIDOR", maya: "K’ax nak’, jichnak’." },
+		{ spanish: "CEÑIR", maya: "K’aax, jeep’, jiich’, t’iin." },
+		{ spanish: "CEPILLAR", maya: "Jo’och, púus, súus." },
+		{ spanish: "CERA", maya: "Lokok, iis." },
+		{ spanish: "CERCA", maya: "Suup’." },
+		{ spanish: "CERCA", maya: "Naats’," },
+		{ spanish: "CERCAR", maya: "K’al paach, bak’paach, suup’, koot." },
+		{ spanish: "CERCO", maya: "Suup’, koot." },
+		{ spanish: "CERDO", maya: "K’éek’en." },
+		{ spanish: "CEREBRO", maya: "Ts’o’om." },
+		{ spanish: "CERILLO", maya: "Jiri’ich joop." },
+		{ spanish: "CERO", maya: "Mixba’al." },
+		{ spanish: "CERÚMEN", maya: "Ta’ xikin." },
+		{ spanish: "CERVATILLO", maya: "Aal kéej." },
+		{ spanish: "CERVIZ", maya: "Kúul kaal, pachkab." },
+		{ spanish: "CERRAR", maya: "K’aal, ch’oot, maak." },
+		{ spanish: "CERRO", maya: "Pu’uk, wiits, múul." },
+		{ spanish: "CESAR", maya: "Jáawa, ts’o’ok, ch’éen." },
+		{ spanish: "CÉSPED", maya: "Su’uk." },
+		{ spanish: "CESTO", maya: "Xáak, xúuxak." },
+		{ spanish: "CICATRIZ", maya: "Buy bak’." },
+		{ spanish: "CICLÓN", maya: "Chak iik’." },
+		{ spanish: "CIEGO", maya: "Ch’óop." },
+		{ spanish: "CIELO", maya: "Ka’an." },
+		{ spanish: "CIEMPIÉS", maya: "Chimes, tsemes." },
+		{ spanish: "CIÉNEGA", maya: "Áak’al, áak’alche’, chak luuk’." },
+		{ spanish: "CIERTO", maya: "Jaaj, beey," },
+		{ spanish: "CIERVO", maya: "Kéej." },
+		{ spanish: "CIGARRA", maya: "Ch’och’lim, ch’och’lem." },
+		{ spanish: "CIGARRO", maya: "Chamal." },
+		{ spanish: "CIGARRÓN", maya: "Koochol." },
+		{ spanish: "CIMA", maya: "P’iich." },
+		{ spanish: "CIMBRAR", maya: "K’ool, jaats’, wich’" },
+		{ spanish: "CIMENTAR", maya: "Eets’, jeets’, akkun." },
+		{ spanish: "CIMIENTO", maya: "Chuun pak’." },
+		{ spanish: "CINCHA", maya: "K’ax nak’." },
+		{ spanish: "CINCHAR", maya: "K’aax." },
+		{ spanish: "CINE", maya: "Cha’an." },
+		{ spanish: "CÍNICO", maya: "Ma’ subtal máak." },
+		{ spanish: "CÍRCULO", maya: "Wóolis." },
+		{ spanish: "CIRICOTE", maya: "K’óopte’." },
+		{ spanish: "CIRIO", maya: "Nojoch kib." },
+		{ spanish: "CIRUELA", maya: "Abal." },
+		{ spanish: "CITA", maya: "T’aanbail; k’iin ku ya’aliko’ob yan u yilkuba máako’ob ti’ junp’éel tu’ux." },
+		{ spanish: "CITAR", maya: "U ya’ala’al tu’ux yéetel ba’ax k’iin kun u yiluba máako’ob; t’aanbail." },
+		{ spanish: "CIUDAD", maya: "Noj kaaj, nojoch kaaj" },
+		{ spanish: "CIVILIZAR", maya: "Kaambes, kaanbes." },
+		{ spanish: "CLAMAR", maya: "Awat, táataj awat." },
+		{ spanish: "CLAMOR", maya: "Awat." },
+		{ spanish: "CLARA", maya: "Sakil je’." },
+		{ spanish: "CLAREAR", maya: "Sáastal, sáasital." },
+		{ spanish: "CLARIDAD", maya: "Sáas, sáasil." },
+		{ spanish: "CLARO", maya: "Sáas, sáasil." },
+		{ spanish: "CLASE", maya: "Xook." },
+		{ spanish: "CLASIFICAR", maya: "Tsool." },
+		{ spanish: "CLAUSURAR", maya: "K’aal, ts’o’oks" },
+		{ spanish: "CLAVAR", maya: "Baaj, ch’iik, ts’oop." },
+		{ spanish: "CLAVÍCULA", maya: "U ni’ baakel tseen; puytáanil." },
+		{ spanish: "CLÉRIGO", maya: "(J)K’iin, yuum k’iin." },
+		{ spanish: "CLERO", maya: "(J) K’iino’ob, yuum k’iino’ob." },
+		{ spanish: "CLIENTE", maya: "(J)Maab, (x)Maan." },
+		{ spanish: "CLIMA", maya: "K’iin." },
+		{ spanish: "CLÍTORIS", maya: "U yaak’ peel." },
+		{ spanish: "CLOQUEAR", maya: "Totojk’eb, totok k’eb." },
+		{ spanish: "COA", maya: "Lóobche’, lóo’che’" },
+		{ spanish: "COAGULAR", maya: "Lakbal, síistal, olomtal." },
+		{ spanish: "COATI", maya: "Chi’ik." },
+		{ spanish: "COBARDE", maya: "Sajak, saj óol, saj lu’um." },
+		{ spanish: "COBERTOR", maya: "Teep’." },
+		{ spanish: "COBIJA", maya: "Teep’." },
+		{ spanish: "COBIJAR", maya: "Piix, teep’" },
+		{ spanish: "COBRAR", maya: "Mol p’aax, u ch’a’abal u tojol, koonol wáa meyaj." },
+		{ spanish: "COCER", maya: "Chaak, tajankun." },
+		{ spanish: "COCINA", maya: "K’óoben." },
+		{ spanish: "COCINAR", maya: "Chak janal, meen janal." },
+		{ spanish: "COCODRILO", maya: "Áain, áayin." },
+		{ spanish: "COCOYOL", maya: "Tuk’" },
+		{ spanish: "COCHINO", maya: "(m)Kéek’en, (f) (x)leech." },
+		{ spanish: "CODORNIZ", maya: "Beech’," },
+		{ spanish: "COGER", maya: "Ch’e’ maach." },
+		{ spanish: "COGOLLO", maya: "Óol, k’u’uk." },
+		{ spanish: "COGOTE", maya: "Pachkab." },
+		{ spanish: "COITO", maya: "Ts’iis, naach’, taal." },
+		{ spanish: "COJEAR", maya: "Kojk’alak, tomchalak" },
+		{ spanish: "COLA", maya: "Nej." },
+		{ spanish: "COLADOR", maya: "Cháanchab." },
+		{ spanish: "COLAR", maya: "Cháach, máayt." },
+		{ spanish: "COLGAR", maya: "Ch’uuy, leech." },
+		{ spanish: "COLIBRÍ", maya: "Ts’unu’un." },
+		{ spanish: "COLINA", maya: "Pu’uk, búu’tun, chan wiits." },
+		{ spanish: "COLMENA", maya: "Jobon." },
+		{ spanish: "COLMILLO", maya: "Ts’a’ay." },
+		{ spanish: "COLOR", maya: "Boon, boonil." },
+		{ spanish: "COLORADILLA", maya: "Chek’ech chak peech, chek’ex." },
+		{ spanish: "COLUMNA", maya: "T’o’ol, tsool." },
+		{ spanish: "COMA", maya: "Yaajtal, muk’yaj." },
+		{ spanish: "COMADREJA", maya: "Sáabin." },
+		{ spanish: "COMAL", maya: "Xamach." },
+		{ spanish: "COMBATE", maya: "Ba’ate’el, ba’ate’il" },
+		{ spanish: "COMBATIR", maya: "Ba’ate’el." },
+		{ spanish: "COMEDOR", maya: "Kúuchil janal." },
+		{ spanish: "COMEJÉN", maya: "K’amas." },
+		{ spanish: "COMENZAR", maya: "Káajal, jo’op’ol, léekel, chúunpajal." },
+		{ spanish: "COMER", maya: "Janal." },
+		{ spanish: "COMERCIAR", maya: "Koonol." },
+		{ spanish: "COMETA", maya: "Buts’ eek’" },
+		{ spanish: "COMEZÓN", maya: "Saak’, saak’il." },
+		{ spanish: "COMIDA", maya: "Janal, o’och." },
+		{ spanish: "COMIENZO", maya: "Chúunpajal, káajal, léekel, jo’op’ol." },
+		{ spanish: "COMPAÑERO", maya: "Láak’ nuup, éet." },
+		{ spanish: "COMPAÑÍA", maya: "Éet, éetel, iknal, láak’in." },
+		{ spanish: "COMPARAR", maya: "Keet, éet p’iis." },
+		{ spanish: "COMPLETAR", maya: "Chúukbes." },
+		{ spanish: "COMPLETO", maya: "Chuup. Chúuka’an," },
+		{ spanish: "COMPONER", maya: "Ma’alobkun, utskiin." },
+		{ spanish: "COMPRA", maya: "Maan." },
+		{ spanish: "COMPRADOR", maya: "May ku maan, (J)maan, (x)maan." },
+		{ spanish: "COMPRAR", maya: "Maan." },
+		{ spanish: "COMPRENDER", maya: "Na’at." },
+		{ spanish: "COMPRESIÓN", maya: "Yoot’, peech’ peets’." },
+		{ spanish: "COMPRIMIR", maya: "Chchankun, mejenkun, peech’, peets." },
+		{ spanish: "COMUNICAR", maya: "A’al, t’aan." },
+		{ spanish: "CONCAVIDAD", maya: "Yaam, k’óom taam." },
+		{ spanish: "CONCEBIR", maya: "Yo’omtal" },
+		{ spanish: "CONCEDER", maya: "Ts’aa." },
+		{ spanish: "CONCENTRAR", maya: "Much’kiin, mool." },
+		{ spanish: "CONCEPTO", maya: "Na’at, tuunkul." },
+		{ spanish: "CONCERTAR", maya: "Ma’alobkin, utskiin." },
+		{ spanish: "CONCIENCIA", maya: "Na’at, tuukul." },
+		{ spanish: "CONCLUIR", maya: "Ts’o’ok, ts’o’okol." },
+		{ spanish: "CONCLUSIÓN", maya: "Ts’o’okol" },
+		{ spanish: "CONCURRIR", maya: "Much’tal." },
+		{ spanish: "CONCHA", maya: "Sóol, paach." },
+		{ spanish: "CONDENA", maya: "Bo’ol k’eban, xot’ k’iin." },
+		{ spanish: "CONDENADO", maya: "Paula’an u k’iin, xota’an u k’iin" },
+		{ spanish: "CONDENAR", maya: "Xot’ k’iin, pul k’iin." },
+		{ spanish: "CONDIMENTAR", maya: "Xa’ak, ts’aaxa’ak." },
+		{ spanish: "CONDIMENTO", maya: "Xa’ak’." },
+		{ spanish: "CONDISCÍPULO", maya: "Éet xook." },
+		{ spanish: "CONDONAR", maya: "Sa’as k’eban." },
+		{ spanish: "CONDUCIR", maya: "Biis, aktáant." },
+		{ spanish: "CONECTAR", maya: "Nuup’, nuup." },
+		{ spanish: "CONEXIÓN", maya: "Nuup, nuup’." },
+		{ spanish: "CONFERENCIA", maya: "t’aan, tsikbal." },
+		{ spanish: "CONFERIR", maya: "Ts’aa, k’uub." },
+		{ spanish: "CONFESAR", maya: "A’al k’eban, tsol k’eban." },
+		{ spanish: "CONFESIÓN", maya: "A’al k’eban, tsolk’eban." },
+		{ spanish: "CONFIADO", maya: "Alab óol." },
+		{ spanish: "CONFIAR", maya: "Alab óol" },
+		{ spanish: "CONFLICTO", maya: "Ba’ate’el, ba’ate’il." },
+		{ spanish: "CONFUNDIR", maya: "Sat óol xa’ak’ pajal." },
+		{ spanish: "CONGELAR", maya: "Síiskun, síistal" },
+		{ spanish: "CONGREGACIÓN", maya: "Múuch’." },
+		{ spanish: "CONGREGAR", maya: "Much’kin, mulkin." },
+		{ spanish: "CONJUNTAR", maya: "Much’kin, mulkin." },
+		{ spanish: "CONJUNTO", maya: "Múuch’." },
+		{ spanish: "CONMEMORAR", maya: "K’iinbes." },
+		{ spanish: "CONMOVER", maya: "Péeks óol" },
+		{ spanish: "CONOCER", maya: "K’aj óol, ojéelt." },
+		{ spanish: "CONOCIMIENTO", maya: "Na’at, Ojel, tuukul; k’aj óolal" },
+		{ spanish: "CONSEJERO", maya: "Tsol xikin." },
+		{ spanish: "CONSENTIR", maya: "Cha’; u p’a’atal u meenta’al je’ ba’axake’." },
+		{ spanish: "CONSERJE", maya: "(J)Kanan, (J)Kalan." },
+		{ spanish: "CONSERVAR", maya: "Kanáan, kaláan, líik’s." },
+		{ spanish: "CONSOLAR", maya: "Náays óol" },
+		{ spanish: "CONSOLIDAR", maya: "Chichkuun" },
+		{ spanish: "CONSOMÉ", maya: "K’aab bak’, ja’il bak’." },
+		{ spanish: "CONSORTE", maya: "(m)íicham, (F) atan." },
+		{ spanish: "CONSTELACIÓN", maya: "Eek’o’ob u tsolmubao’ob." },
+		{ spanish: "CONSTRUCCIÓN", maya: "Beet, meent, líik’s" },
+		{ spanish: "CONSTRUIR", maya: "Beet, meent, wa’akun, líik’s." },
+		{ spanish: "CONSULTAR", maya: "K’áat chi’." },
+		{ spanish: "CONSUMAR", maya: "Ts’o’okol." },
+		{ spanish: "CONSUMIR", maya: "Xuup." },
+		{ spanish: "CONTAR", maya: "Xook; tsikbal, a’al." },
+		{ spanish: "CONTENER", maya: "Biis, ba’al." },
+		{ spanish: "CONTENTAR", maya: "Ki’imakkun." },
+		{ spanish: "CONTENTO", maya: "Ki’imak óol, ki’ki óol, ki’imak." },
+		{ spanish: "CONTESTAR", maya: "Nuuk." },
+		{ spanish: "CONTIGUO", maya: "Éet chi’, tutséel." },
+		{ spanish: "CONTORNO", maya: "Bak’ paach." },
+		{ spanish: "CONTRAER", maya: "Moots, moot," },
+		{ spanish: "CONTRIBUCIÓN", maya: "Bo’ol, áant, áantaj." },
+		{ spanish: "CONTRIBUIR", maya: "Áant, áantaj, bo’ol." },
+		{ spanish: "CONVALECER", maya: "Ch’a’ muuk’, ch’a’ óol, utstal." },
+		{ spanish: "CONVERSACIÓN", maya: "T’aan, tsikbal." },
+		{ spanish: "CONVERSAR", maya: "T’aan, tsikbal." },
+		{ spanish: "CONVERTIR", maya: "Suut, k’eex." },
+		{ spanish: "CONVIDAR", maya: "Múul janal." },
+		{ spanish: "CONVIVIR", maya: "Múuch’ kuxtal, múul kuxtal, éet kajtal." },
+		{ spanish: "CONVOCAR", maya: "T’aan, t’aanbaj, t’aanbail." },
+		{ spanish: "CONVULSIÓN", maya: "Lo’ot’ol." },
+		{ spanish: "CÓNYUGE", maya: "(m)íicham, (f)atan." },
+		{ spanish: "COPETE", maya: "P’oot." },
+		{ spanish: "COPIAR", maya: "U meenta’al junp’éel ba’al je’ex uláak’e’." },
+		{ spanish: "CORAJE", maya: "Ts’íikil, p’u’ujul." },
+		{ spanish: "CORALILLO", maya: "Kalam." },
+		{ spanish: "CORAZÓN", maya: "Puksi’ik’al." },
+		{ spanish: "CORCHAR", maya: "Jaax, bal k’ab, ch’oot." },
+		{ spanish: "CORCHO", maya: "Mak’." },
+		{ spanish: "CORDERO", maya: "Chan taman." },
+		{ spanish: "CORDILLERA", maya: "Pu’uk, wits." },
+		{ spanish: "CORDÓN", maya: "K’ax táab chan suum, k’uuch." },
+		{ spanish: "CORO", maya: "Múul k’aay, múuch’ k’aay." },
+		{ spanish: "CORRAL", maya: "Kúuchil tu’ux ku k’a’alal ba’alche’o’ob je’ex" },
+		{ spanish: "CORREA", maya: "K’axnak’." },
+		{ spanish: "CORRECAMINOS", maya: "K’úumk’umi." },
+		{ spanish: "CORREGIR", maya: "Utskiin." },
+		{ spanish: "CORRER", maya: "Áalkab." },
+		{ spanish: "CORRETEAR", maya: "Áalkabans, áalkabkun, áalkabt." },
+		{ spanish: "CORRIDA", maya: "Áalkab; pay wakax." },
+		{ spanish: "CORNEAR", maya: "K’óoch." },
+		{ spanish: "CORNUDO", maya: "Máak ku tu’usul tumen yatan wáa u yíicham." },
+		{ spanish: "CORROER", maya: "Waay, ma’as." },
+		{ spanish: "CORSARIO", maya: "May ku yookol ich k’áak’náab." },
+		{ spanish: "CORTAR", maya: "Ch’aak, xoot, xoot’, k’uup." }
+
+        ];
+
+        // Función para capitalizar solo la primera letra.
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        }
+
+        // Función principal para renderizar la lista
+        function renderDictionary() {
+            const listContainer = document.getElementById('dictionary-list');
+            listContainer.innerHTML = ''; // Limpiar el mensaje de carga
+
+            DICTIONARY_DATA.forEach((item, index) => {
+                const spanishWord = capitalizeFirstLetter(item.spanish);
+
+                // 1. Creación de la tarjeta/elemento de definición
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 sm:p-5 rounded-xl shadow-lg hover:shadow-xl transition-shadow card-divider';
+                
+                // 2. Palabra en español (clickeable)
+                const spanishEl = document.createElement('h2');
+                // Añadimos un ID único para poder vincular la definición a este elemento.
+                spanishEl.id = `word-${index}`; 
+                spanishEl.className = 'spanish-word text-xl sm:text-2xl font-extrabold mb-1 select-none'; // select-none evita que el texto se seleccione al hacer clic
+                spanishEl.textContent = spanishWord;
+
+                // 3. Contenedor de la definición en maya (Inicialmente oculta)
+                const mayaContainer = document.createElement('div');
+                // Clase CSS para ocultar/mostrar con animación
+                mayaContainer.className = 'maya-definition'; 
+                mayaContainer.id = `definition-${index}`;
+
+                // 4. Contenido de la definición
+                const mayaEl = document.createElement('p');
+                mayaEl.className = 'text-base sm:text-lg text-text-primary leading-relaxed';
+                mayaEl.textContent = item.maya;
+                
+                // 5. Armar la definición dentro del contenedor
+                mayaContainer.appendChild(mayaEl);
+
+                // 6. Configurar el evento de click en la palabra en español
+                spanishEl.addEventListener('click', () => {
+                    // Alternar la clase 'visible' para mostrar u ocultar la definición
+                    mayaContainer.classList.toggle('visible');
+
+                    // Opcional: Ocultar todas las demás definiciones abiertas
+                    // document.querySelectorAll('.maya-definition.visible').forEach(def => {
+                    //     if (def.id !== mayaContainer.id) {
+                    //         def.classList.remove('visible');
+                    //     }
+                    // });
+                });
+
+                // 7. Armar la tarjeta completa
+                card.appendChild(spanishEl);
+                // El separador se moverá justo antes del contenido en maya visible
+                const divider = document.createElement('div');
+                divider.className = 'w-10 h-0.5 bg-maya-gray/50 mb-1 rounded-full';
+                
+                // Se coloca el separador dentro del contenedor oculto/visible para que aparezca con la definición.
+                mayaContainer.prepend(divider); 
+                
+                card.appendChild(mayaContainer);
+
+                listContainer.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDictionary);
+
+    </script>
+</body>
+</html>

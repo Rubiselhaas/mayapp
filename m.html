@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MayApp - Letra M</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Definición de la paleta de colores en CSS para usar en JS y como utilidad */
+        :root {
+            --color-maroon: #9F2241;
+            --color-khaki: #BCA986;
+            --color-green: #235B4E;
+            --color-gray: #888B8D;
+            --color-text-primary: #1F2937; /* Darker text for readability */
+        }
+        
+        /* Configuración de Tailwind para usar las variables de color */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'maya-maroon': 'var(--color-maroon)',
+                        'maya-khaki': 'var(--color-khaki)',
+                        'maya-green': 'var(--color-green)',
+                        'maya-gray': 'var(--color-gray)',
+                        'text-primary': 'var(--color-text-primary)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+
+        /* Estilo base para asegurar que la fuente Inter se aplique */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        /* Estilos del encabezado */
+        .header-bg {
+            background-color: var(--color-maroon);
+        }
+        .header-text {
+            color: var(--color-khaki);
+        }
+
+        /* Estilo para la palabra en español (clickable) */
+        .spanish-word {
+            color: var(--color-green);
+            cursor: pointer; /* Indica que es clickeable */
+            transition: color 0.2s ease-in-out;
+        }
+        .spanish-word:hover {
+            color: #1A473C; /* Un verde un poco más oscuro al pasar el ratón */
+        }
+
+        /* CLASE PARA LA DEFINICIÓN OCULTA */
+        .maya-definition {
+            max-height: 0; /* Inicialmente oculto */
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        /* CLASE PARA LA DEFINICIÓN VISIBLE */
+        .maya-definition.visible {
+            max-height: 100px; /* Suficientemente grande para contener la definición */
+            opacity: 1;
+            margin-top: 0.5rem; /* Pequeño margen superior al mostrar */
+        }
+        
+        /* Estilo para el separador o borde de los elementos */
+        .card-divider {
+            border-bottom: 1px solid var(--color-gray);
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- Encabezado Fijo -->
+    <header class="header-bg shadow-lg sticky top-0 z-10 rounded-b-xl">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="header-text text-xl sm:text-2xl font-bold tracking-wider">
+                MayApp - Diccionario maya
+            </h1>
+            <span class="bg-maya-khaki text-maya-maroon px-3 py-1 text-sm font-semibold rounded-full shadow-md">
+                Letra M
+            </span>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal de la Lista -->
+    <main class="max-w-4xl mx-auto p-4 pt-8">
+        <div id="dictionary-list" class="space-y-4">
+            <!-- Las tarjetas del diccionario se renderizarán aquí -->
+            <div class="text-center p-8 text-maya-gray">Cargando palabras...</div>
+        </div>
+    </main>
+
+    <!-- Pie de página discreto -->
+    <footer class="mt-12 py-4 bg-gray-100 text-center text-xs text-maya-gray border-t border-maya-gray/30">
+        <p>Proyecto de Lengua y Cultura Maya. Haz clic en la palabra en español para ver la traducción.</p>
+    </footer>
+
+    <script>
+        // Datos del diccionario actualizados del documento 'A [actualizado].docx', corregidos hasta AZUZAR.
+        // Formato: { spanish: "Palabra Española", maya: "DEFINICIÓN EN MAYA" }
+        const DICTIONARY_DATA = [
+            
+		{ spanish: "Macana", maya: "Xtol, xtol che’." },
+		{ spanish: "Maceta", maya: "Pak’al ts’aba’an ti’ p’úul wáa ti’ kuum." },
+		{ spanish: "Machacar", maya: "Kool, k’uut, peech’, maax." },
+		{ spanish: "Machete", maya: "Máaskab." },
+		{ spanish: "Machetear", maya: "Ch’aak yéetel máaskab." },
+		{ spanish: "Macho", maya: "Xiib, xibi ba’alche’" },
+		{ spanish: "Machorra", maya: "(x)Ch’up ma’ tu ts’aik u yaal." },
+		{ spanish: "Machucar", maya: "Peech’, maax, muux, yaach’." },
+		{ spanish: "Madeja", maya: "Cháach, chúuch. K’aax." },
+		{ spanish: "Madera", maya: "Che’" },
+		{ spanish: "Madero", maya: "Che’" },
+		{ spanish: "Madrastra", maya: "Majan na’." },
+		{ spanish: "Madre", maya: "Na’" },
+		{ spanish: "Madriguera", maya: "Áaktun, k’u’, sajkab." },
+		{ spanish: "Madrugada", maya: "Ja’atskab k’iin, sáastal." },
+		{ spanish: "Madurar", maya: "Tajal, tajankun, tak’antal." },
+		{ spanish: "Maestro, a", maya: "(j)Kaansaj, (j)kaambesaj, (x)ka’ansaj xook." },
+		{ spanish: "Magullar", maya: "Nuul, maax." },
+		{ spanish: "Maíz", maya: "Ixi’im, (-en mazorca) nal." },
+		{ spanish: "Majar", maya: "Maax, peech’, yaach’." },
+		{ spanish: "Mal", maya: "K’aas, loob." },
+		{ spanish: "Maldad", maya: "K’aasil, loobil." },
+		{ spanish: "Malear", maya: "K’askun, k’astal, k’aspajal." },
+		{ spanish: "Maleza", maya: "Aban, loob, k’ak’as xíiw." },
+		{ spanish: "Maltratar", maya: "To’to’op." },
+		{ spanish: "Malva", maya: "Chi’chi’bej" },
+		{ spanish: "Malla", maya: "Sawin." },
+		{ spanish: "Mamá", maya: "Na’." },
+		{ spanish: "Mamar", maya: "Chu’uch." },
+		{ spanish: "Manantial", maya: "Sayab." },
+		{ spanish: "Manatí", maya: "Teek." },
+		{ spanish: "Mancebo", maya: "Táankelen, táankelem." },
+		{ spanish: "Mancillar", maya: "U báabaxta’al xch’up." },
+		{ spanish: "Mancha", maya: "Éek’" },
+		{ spanish: "Mandar", maya: "Túux, tusbeel." },
+		{ spanish: "Mandíbula", maya: "Kama’ach." },
+		{ spanish: "Manga", maya: "K’abil, k’abil nook’." },
+		{ spanish: "Mango", maya: "Ook." },
+		{ spanish: "Manija", maya: "K’ab." },
+		{ spanish: "Manjar", maya: "Ki’il." },
+		{ spanish: "Mano", maya: "K’ab." },
+		{ spanish: "Manojo", maya: "Cháach’, ch’uuy, k’aax." },
+		{ spanish: "Manosear", maya: "Báabax, máamach" },
+		{ spanish: "Manso, a", maya: "Suuk." },
+		{ spanish: "Manteca", maya: "Tsaats." },
+		{ spanish: "Mantel", maya: "Nook’ ku ja’ayal yóok’ol mayak che’." },
+		{ spanish: "Mantener", maya: "Tséen, kuxkin." },
+		{ spanish: "Mañana", maya: "Sáamal, ja’atskab." },
+		{ spanish: "Mapache", maya: "K’ulu’." },
+		{ spanish: "Mar", maya: "K’áak’náab." },
+		{ spanish: "Maravillar", maya: "Ja’ak’ óol, jak’óol." },
+		{ spanish: "Marca", maya: "Weet." },
+		{ spanish: "Marcar", maya: "Chíikbes, weel." },
+		{ spanish: "Marchar", maya: "Xiimbal, bin" },
+		{ spanish: "Marchitar", maya: "Much’, muuts’, chuchul, kíimil, k’ak’altal." },
+		{ spanish: "Marear", maya: "Éek’joch’e’ental Ich." },
+		{ spanish: "Margen", maya: "Chi’, jáal." },
+		{ spanish: "Maricón", maya: "Ch’upu xiib." },
+		{ spanish: "Marido", maya: "Íicham." },
+		{ spanish: "Mariposa", maya: "Péepem, péepen." },
+		{ spanish: "Marisco", maya: "K’omoj." },
+		{ spanish: "Marrano, a", maya: "(m)K’éek’en, (f)xleech." },
+		{ spanish: "Martillo", maya: "Bajab." },
+		{ spanish: "Martirizar", maya: "Muk’yaj." },
+		{ spanish: "Más", maya: "Máas, maasil ." },
+		{ spanish: "Masa", maya: "Sakam, juuch’." },
+		{ spanish: "Masacrar", maya: "Kíinsaj." },
+		{ spanish: "Masaje", maya: "Páats’, yéet’, yeets’." },
+		{ spanish: "Mascar", maya: "Cha’ach, jaach’" },
+		{ spanish: "Máscara", maya: "Tep’ ich, pix ich." },
+		{ spanish: "Masculino, a", maya: "Xiib." },
+		{ spanish: "Masticar", maya: "Cha’ach, jaach’." },
+		{ spanish: "Masturbarse", maya: "Kóol keep, kóol iit." },
+		{ spanish: "Mata", maya: "Che’" },
+		{ spanish: "Matanza", maya: "Kíimsaj, banban kíimsaj." },
+		{ spanish: "Matar", maya: "Kíimsaj" },
+		{ spanish: "Matorral", maya: "Aban, jaban, pokche’." },
+		{ spanish: "Matraca", maya: "Bojol che’." },
+		{ spanish: "Matrimonio", maya: "Ts’o’okol beel." },
+		{ spanish: "Matrona", maya: "Xunáan, ko’olel." },
+		{ spanish: "Maullar", maya: "Awat miis, ok’ol miis." },
+		{ spanish: "Maxilar", maya: "Kama’ach." },
+		{ spanish: "Maya", maya: "(idioma) maaya t’aan" },
+		{ spanish: "Mayor", maya: "Nojochil." },
+		{ spanish: "Mayoral", maya: "Mayokol, mayol." },
+		{ spanish: "Mazorca", maya: "Nal, jek’ nal." },
+		{ spanish: "Mear", maya: "Wiix." },
+		{ spanish: "Mecapal", maya: "Táab," },
+		{ spanish: "Mecate", maya: "K’aan, ts’áak." },
+		{ spanish: "Mecer", maya: "Úumbal, úumbaj, pik’." },
+		{ spanish: "Mechón", maya: "P’oot, (-de pavo) tsuum." },
+		{ spanish: "Medicar", maya: "Ts’aak." },
+		{ spanish: "Médico, a", maya: "Ts’ak máak ts’ak yaj." },
+		{ spanish: "Medida", maya: "P’iis, p’isib ." },
+		{ spanish: "Medir", maya: "P’iis." },
+		{ spanish: "Meditar", maya: "Tuukul." },
+		{ spanish: "Médula", maya: "Ts’o’omel baak." },
+		{ spanish: "Mejilla", maya: "P’u’uk." },
+		{ spanish: "Mejorar", maya: "Ma’alobkin, ma’alobtal." },
+		{ spanish: "Mellar", maya: "P’uuy, ts’eej." },
+		{ spanish: "Mellizo, a", maya: "Iich." },
+		{ spanish: "Mendigar", maya: "K’áat, máatan." },
+		{ spanish: "Mendigo, a", maya: "(j)Máatan, (j)K’áat máatan;" },
+		{ spanish: "Menear", maya: "K’uuy, biik’, yúuk, pipik’" },
+		{ spanish: "Meneo", maya: "Niik’, k’uuy, biik’, bibik’, pipik’." },
+		{ spanish: "Menester", maya: "K’abéet." },
+		{ spanish: "Menguar", maya: "Éemel, kaabaltal." },
+		{ spanish: "Menor", maya: "Chan, chichan, ts’iris." },
+		{ spanish: "Mensaje", maya: "T’aan, k’iben t’aan." },
+		{ spanish: "Menso, a", maya: "(j)Meelen kep, (x)meelen peel." },
+		{ spanish: "Menstruación", maya: "Éemel k’i’ik’." },
+		{ spanish: "Menstruar", maya: "Éemel k’i’ik’." },
+		{ spanish: "Mensura", maya: "P’iis, jol ch’ak." },
+		{ spanish: "Mensurar", maya: "P’iis, xot’ k’áax, jol ch’ak." },
+		{ spanish: "Mente", maya: "Tuukul." },
+		{ spanish: "Mentir", maya: "Tuus.." },
+		{ spanish: "Mentira", maya: "Tuus." },
+		{ spanish: "Mentón", maya: "No’och." },
+		{ spanish: "Meñique", maya: "(dedo) T’uup." },
+		{ spanish: "Meollo", maya: "Nooy, ts’u’." },
+		{ spanish: "Mercado", maya: "K’íiwik, u kúuchil u ko’onol yéetel u ma’anal ba’alo’ob" },
+		{ spanish: "Meretriz", maya: "(x)Káakbach, (x)choko iit," },
+		{ spanish: "Meridano, a", maya: "Jo’il." },
+		{ spanish: "Mermar", maya: "P’íitkun, éemel, kaabaltal, kaabalkun." },
+		{ spanish: "Mesa", maya: "Ka’anche’, mayak, che’." },
+		{ spanish: "Meta", maya: "Xuul." },
+		{ spanish: "Metate", maya: "Ka’." },
+		{ spanish: "Meteorito", maya: "K’áak’, chamal xnuuk." },
+		{ spanish: "Meter", maya: "Ts’oot, juup, chook’, oks, kaap." },
+		{ spanish: "Mezcla", maya: "Xa’ak’, xe’ek, ya’ach’" },
+		{ spanish: "Mi", maya: "In, tin." },
+		{ spanish: "Miarda", maya: "Ta’." },
+		{ spanish: "Microbio", maya: "Ik’el." },
+		{ spanish: "Miedo", maya: "Sajkil, sajakil." },
+		{ spanish: "Miel", maya: "Kaab." },
+		{ spanish: "Miembro", maya: "(viril) Keep, toon, xiibil." },
+		{ spanish: "Mierda", maya: "Ta’." },
+		{ spanish: "Migaja", maya: "P’úuy, xéet’, xéet’el, xix, xiixel." },
+		{ spanish: "Milpa", maya: "Kool." },
+		{ spanish: "Milpero", maya: "(J)Kolnáal." },
+		{ spanish: "Mío, a", maya: "In tia’al." },
+		{ spanish: "Mirar", maya: "Il, paakat, cha’an." },
+		{ spanish: "Miseria", maya: "Óotsilil." },
+		{ spanish: "Mitad", maya: "Búuj, táan buj, táan chumuk, táankoch." },
+		{ spanish: "Moco", maya: "Síim, síin." },
+		{ spanish: "Mocho, a", maya: "Móoch." },
+		{ spanish: "Moderar", maya: "P’iis, ts’aa p’iis." },
+		{ spanish: "Modista", maya: "(x)Chuuy." },
+		{ spanish: "Modo", maya: "Bay, bey, beya’, beyo’ bix, lay." },
+		{ spanish: "Mofar", maya: "P’a’as. Eets’." },
+		{ spanish: "Moho", maya: "Kuuxum, ta’ cháak." },
+		{ spanish: "Mojar", maya: "Ch’uul." },
+		{ spanish: "Mojón", maya: "Xu’uk, multun." },
+		{ spanish: "Mojonera", maya: "Xu’uk’, multun." },
+		{ spanish: "Molar", maya: "Cha’am koj." },
+		{ spanish: "Molde", maya: "U nu’ukul jóojochil tu’ux ku láala’al wáa ba’ax" },
+		{ spanish: "Moldear", maya: "Paat, u meenta’al wáa ba’ax ichil junp’éel un’ukul jóojochil." },
+		{ spanish: "Moler", maya: "Juuch’, muux." },
+		{ spanish: "Molestar", maya: "K’uuxil, ts’íikil, p’u’ujul." },
+		{ spanish: "Molinillo", maya: "Juuyub." },
+		{ spanish: "Molleja", maya: "Tuuch." },
+		{ spanish: "Mollera", maya: "Ya’al" },
+		{ spanish: "Momento", maya: "Súut, súutuk." },
+		{ spanish: "Momoto", maya: "Toj." },
+		{ spanish: "Mondar", maya: "Ts’eej, Ts’iil, p’eel." },
+		{ spanish: "Mondongo", maya: "U tsuukel wakax meenta’an tia’al jaantbil." },
+		{ spanish: "Moneda", maya: "Taak’in." },
+		{ spanish: "Monedero", maya: "U nu’ukul tu’ux ku ts’a’abal taak’in." },
+		{ spanish: "Mono", maya: "Ma’ax." },
+		{ spanish: "Monografía", maya: "U ts’íibil ba’alo’ob ucha’an, ba’alo’ob yaan yéetel ba’alo’ob ku meenta’al ti’ junp’éel kaaj." },
+		{ spanish: "Monstruo", maya: "K’aak’as máak, k’aak’as ba’al." },
+		{ spanish: "Montaña", maya: "Wiits, noj k’aax." },
+		{ spanish: "Montar", maya: "Naat’." },
+		{ spanish: "Monte", maya: "K’áax." },
+		{ spanish: "Montículo", maya: "Múul," },
+		{ spanish: "Montón", maya: "Túuk, múul, múuch’ tsúuk." },
+		{ spanish: "Montura", maya: "Xéek." },
+		{ spanish: "Moño", maya: "T’uuch." },
+		{ spanish: "Morada", maya: "Otoch, naj, taanaj" },
+		{ spanish: "Morar", maya: "Kajtal." },
+		{ spanish: "Morcilla", maya: "Chooch." },
+		{ spanish: "Mordaza", maya: "K’ax chi’." },
+		{ spanish: "Morder", maya: "Chi’ibal, níich’, k’uux." },
+		{ spanish: "Mordizco", maya: "Níich’, k’uux, nóot’, néet’." },
+		{ spanish: "Moreno, a", maya: "Boox." },
+		{ spanish: "Morir", maya: "Kíimil." },
+		{ spanish: "Morral", maya: "Chíim, sáabukan." },
+		{ spanish: "Mortaja", maya: "Nook’ ku meyaj utia’al u te’ep’el kimen." },
+		{ spanish: "Mortandad", maya: "Báan kíimil, kíimilil." },
+		{ spanish: "Mortero", maya: "Muxub, k’utub." },
+		{ spanish: "Mosca", maya: "Ya’axkach." },
+		{ spanish: "Mosco", maya: "K’oxol." },
+		{ spanish: "Mosquito", maya: "K’oxol, box k’oxol." },
+		{ spanish: "Mostrar", maya: "E’es" },
+		{ spanish: "Mover", maya: "Péek, péeks, pik’, júuy." },
+		{ spanish: "Mozo, a", maya: "Táankelem; paalitsil." },
+		{ spanish: "Mucosidad", maya: "Síim, síin." },
+		{ spanish: "Muchacho, a", maya: "(m) Paal, táankelem, xi’ipal;" },
+		{ spanish: "Mucho, a", maya: "(superlativo) Jach, sen, seten, jeta’an, ya’ab." },
+		{ spanish: "Muda", maya: "(-de ropa) U jeel nook’" },
+		{ spanish: "Mudar", maya: "Jeel, k’eex." },
+		{ spanish: "Mudo, a", maya: "Toot." },
+		{ spanish: "Mueca", maya: "Éets’, nich’ koj." },
+		{ spanish: "Muela", maya: "Cha’am, cha’am koj." },
+		{ spanish: "Muerte", maya: "Kíimil." },
+		{ spanish: "Muerto, a", maya: "Kimen." },
+		{ spanish: "Mugir", maya: "Awat wakax, áakam wakax." },
+		{ spanish: "Mugre", maya: "Éek’, éek’chok’, kiirits’." },
+		{ spanish: "Mujer", maya: "Ch’up, ko’olel, (x) ba’al." },
+		{ spanish: "Mulato", maya: "Chakaj." },
+		{ spanish: "Muleta", maya: "Che’ ku ts’aik yáanal u xiik’ máak k’oja’an wáaki’inpaja’an u yook tia’al u páajtal u xíimbal." },
+		{ spanish: "Multa", maya: "Bo’ol ku meentik máak ts’o’ok u meentik wáa ba’ax k’aasil." },
+		{ spanish: "Multiplicar", maya: "Ya’abkun." },
+		{ spanish: "Multitud", maya: "Ya’ab, ya’abal, múuch’." },
+		{ spanish: "Mundo", maya: "Yóok’ol kaab." },
+		{ spanish: "Munición", maya: "Yóol ts’oon." },
+		{ spanish: "Muñeca", maya: "Junp’éel báaxal je’ bix chan ko’olel ku báaxtik mejen" },
+		{ spanish: "Muralla", maya: "Pak’, ka’anal pak’." },
+		{ spanish: "Murciélago", maya: "Soots’." },
+		{ spanish: "Murmullo", maya: "Mukul t’aan." },
+		{ spanish: "Murmurar", maya: "Mukul t’aan, mukul chi’." },
+		{ spanish: "Muro", maya: "Pak’." },
+		{ spanish: "Músculo", maya: "Xiich’, muuk’, bak’." },
+		{ spanish: "Museo", maya: "Kúuchil tu’ux ku ye’esa’al úuchben ba’alo’ob." },
+		{ spanish: "Música", maya: "Paax." },
+		{ spanish: "Músico, a", maya: "Máak ku paax." },
+		{ spanish: "Muslo", maya: "Muk’ ook." },
+		{ spanish: "Mutilar", maya: "Xoot’, kúul." },
+		{ spanish: "Muy", maya: "(superlativo) Jach, sen, seten, jéet, jeta’an, táaj." }
+        ];
+
+        // Función para capitalizar solo la primera letra.
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        }
+
+        // Función principal para renderizar la lista
+        function renderDictionary() {
+            const listContainer = document.getElementById('dictionary-list');
+            listContainer.innerHTML = ''; // Limpiar el mensaje de carga
+
+            DICTIONARY_DATA.forEach((item, index) => {
+                const spanishWord = capitalizeFirstLetter(item.spanish);
+
+                // 1. Creación de la tarjeta/elemento de definición
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 sm:p-5 rounded-xl shadow-lg hover:shadow-xl transition-shadow card-divider';
+                
+                // 2. Palabra en español (clickeable)
+                const spanishEl = document.createElement('h2');
+                // Añadimos un ID único para poder vincular la definición a este elemento.
+                spanishEl.id = `word-${index}`; 
+                spanishEl.className = 'spanish-word text-xl sm:text-2xl font-extrabold mb-1 select-none'; // select-none evita que el texto se seleccione al hacer clic
+                spanishEl.textContent = spanishWord;
+
+                // 3. Contenedor de la definición en maya (Inicialmente oculta)
+                const mayaContainer = document.createElement('div');
+                // Clase CSS para ocultar/mostrar con animación
+                mayaContainer.className = 'maya-definition'; 
+                mayaContainer.id = `definition-${index}`;
+
+                // 4. Contenido de la definición
+                const mayaEl = document.createElement('p');
+                mayaEl.className = 'text-base sm:text-lg text-text-primary leading-relaxed';
+                mayaEl.textContent = item.maya;
+                
+                // 5. Armar la definición dentro del contenedor
+                mayaContainer.appendChild(mayaEl);
+
+                // 6. Configurar el evento de click en la palabra en español
+                spanishEl.addEventListener('click', () => {
+                    // Alternar la clase 'visible' para mostrar u ocultar la definición
+                    mayaContainer.classList.toggle('visible');
+
+                    // Opcional: Ocultar todas las demás definiciones abiertas
+                    // document.querySelectorAll('.maya-definition.visible').forEach(def => {
+                    //     if (def.id !== mayaContainer.id) {
+                    //         def.classList.remove('visible');
+                    //     }
+                    // });
+                });
+
+                // 7. Armar la tarjeta completa
+                card.appendChild(spanishEl);
+                // El separador se moverá justo antes del contenido en maya visible
+                const divider = document.createElement('div');
+                divider.className = 'w-10 h-0.5 bg-maya-gray/50 mb-1 rounded-full';
+                
+                // Se coloca el separador dentro del contenedor oculto/visible para que aparezca con la definición.
+                mayaContainer.prepend(divider); 
+                
+                card.appendChild(mayaContainer);
+
+                listContainer.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDictionary);
+
+    </script>
+</body>
+</html>
