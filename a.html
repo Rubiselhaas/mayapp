@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MayApp - Letra A</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* Definición de la paleta de colores en CSS para usar en JS y como utilidad */
+        :root {
+            --color-maroon: #9F2241;
+            --color-khaki: #BCA986;
+            --color-green: #235B4E;
+            --color-gray: #888B8D;
+            --color-text-primary: #1F2937; /* Darker text for readability */
+        }
+        
+        /* Configuración de Tailwind para usar las variables de color */
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'maya-maroon': 'var(--color-maroon)',
+                        'maya-khaki': 'var(--color-khaki)',
+                        'maya-green': 'var(--color-green)',
+                        'maya-gray': 'var(--color-gray)',
+                        'text-primary': 'var(--color-text-primary)',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+
+        /* Estilo base para asegurar que la fuente Inter se aplique */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8f8f8;
+        }
+
+        /* Estilos del encabezado */
+        .header-bg {
+            background-color: var(--color-maroon);
+        }
+        .header-text {
+            color: var(--color-khaki);
+        }
+
+        /* Estilo para la palabra en español (clickable) */
+        .spanish-word {
+            color: var(--color-green);
+            cursor: pointer; /* Indica que es clickeable */
+            transition: color 0.2s ease-in-out;
+        }
+        .spanish-word:hover {
+            color: #1A473C; /* Un verde un poco más oscuro al pasar el ratón */
+        }
+
+        /* CLASE PARA LA DEFINICIÓN OCULTA */
+        .maya-definition {
+            max-height: 0; /* Inicialmente oculto */
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
+        }
+
+        /* CLASE PARA LA DEFINICIÓN VISIBLE */
+        .maya-definition.visible {
+            max-height: 100px; /* Suficientemente grande para contener la definición */
+            opacity: 1;
+            margin-top: 0.5rem; /* Pequeño margen superior al mostrar */
+        }
+        
+        /* Estilo para el separador o borde de los elementos */
+        .card-divider {
+            border-bottom: 1px solid var(--color-gray);
+        }
+    </style>
+</head>
+<body class="min-h-screen antialiased">
+
+    <!-- Encabezado Fijo -->
+    <header class="header-bg shadow-lg sticky top-0 z-10 rounded-b-xl">
+        <div class="max-w-4xl mx-auto p-4 flex justify-between items-center">
+            <h1 class="header-text text-xl sm:text-2xl font-bold tracking-wider">
+                MayApp - Diccionario maya
+            </h1>
+            <span class="bg-maya-khaki text-maya-maroon px-3 py-1 text-sm font-semibold rounded-full shadow-md">
+                Letra A
+            </span>
+        </div>
+    </header>
+
+    <!-- Contenedor Principal de la Lista -->
+    <main class="max-w-4xl mx-auto p-4 pt-8">
+        <div id="dictionary-list" class="space-y-4">
+            <!-- Las tarjetas del diccionario se renderizarán aquí -->
+            <div class="text-center p-8 text-maya-gray">Cargando palabras...</div>
+        </div>
+    </main>
+
+    <!-- Pie de página discreto -->
+    <footer class="mt-12 py-4 bg-gray-100 text-center text-xs text-maya-gray border-t border-maya-gray/30">
+        <p>Proyecto de Lengua y Cultura Maya. Haz clic en la palabra en español para ver la traducción.</p>
+    </footer>
+
+    <script>
+        // Datos del diccionario actualizados del documento 'A [actualizado].docx', corregidos hasta AZUZAR.
+        // Formato: { spanish: "Palabra Española", maya: "DEFINICIÓN EN MAYA" }
+        const DICTIONARY_DATA = [
+            { spanish: "Abajo", maya: "Kaabal, kaabaj, yáanal, yáanaj, yaalan." },
+            { spanish: "Abalanzar", maya: "Puul, píikch’iin." },
+            { spanish: "Abandonar", maya: "P’aat, xúun p’aat." },
+            { spanish: "Abanicar", maya: "Pikil, pikit." },
+            { spanish: "Abanico", maya: "(x) Pikit." },
+            { spanish: "Abaratar", maya: "Éems tojol, kabulkun tojol." },
+            { spanish: "Abarcar", maya: "Bak’paach, méek’, méek’táan." },
+            { spanish: "Abarrotar", maya: "Chuup." },
+            { spanish: "Abarrote", maya: "Ba’alo’ob ku ko’onol ku jach k’abéetchajal." },
+            { spanish: "Abastecer", maya: "Ts’aa ba’ax k’abéet." },
+            { spanish: "Abatir", maya: "Pul kaabal, lúubs." },
+            { spanish: "Abdicar", maya: "P’aat, cha’." },
+            { spanish: "Abdomen", maya: "Nak’, chuun nak’." },
+            { spanish: "Abecedario", maya: "U ts’íibil tuláakal juum ku ya’ala’al ken t’aanak máak." },
+            { spanish: "Abeja", maya: "Yik’el kaab, kaab." },
+            { spanish: "Abejorro", maya: "Báalam kaab, jolom." },
+            { spanish: "Abertura", maya: "Jool, pa’al, xiik." },
+            { spanish: "Abierto", maya: "Je’ek’ab, je’epaja’an." },
+            { spanish: "Abigeato", maya: "Okol wakax wáa ba’alche’o’ob." },
+            { spanish: "Abismo", maya: "Taam." },
+            { spanish: "Abrandar", maya: "Ts’u’uts’ukin, sulbankúun." },
+            { spanish: "Abobar", maya: "Jap chi’, náay óol." },
+            { spanish: "Abocar", maya: "Náats’al." },
+            { spanish: "Abochornar", maya: "Ooxol, chokoj óol." },
+            { spanish: "Abofetear", maya: "Laaj." },
+            { spanish: "Abogar", maya: "Áantaj." },
+            { spanish: "Abolengo", maya: "Ch’i’ibal." },
+            { spanish: "Abolir", maya: "Luk’s, tseel." },
+            { spanish: "Abollar", maya: "Bool." },
+            { spanish: "Abominar", maya: "K’uux, p’eek." },
+            { spanish: "Abonar", maya: "Bo’ol p’aax." },
+            { spanish: "Abono", maya: "Ba’al, ku ts’a’abal ti’ lu’um utia’al u ma’alobtal." },
+            { spanish: "Aborigen", maya: "Maaya wíinik, wi’it’." },
+            { spanish: "Aborrecer", maya: "P’eek." },
+            { spanish: "Abortar", maya: "Éems aal." },
+            { spanish: "Aborto", maya: "Éemel aal." },
+            { spanish: "Abotonar", maya: "K’al nook’." },
+            { spanish: "Abrasar", maya: "Tóok." },
+            { spanish: "Abrazar", maya: "Méek’, lóoch." },
+            { spanish: "Abrazo", maya: "Lóoch, méek’." },
+            { spanish: "Abrevar", maya: "Ts’aa uk’ul." },
+            { spanish: "Abreviar", maya: "Chichankúun, kóom ts’íib." },
+            { spanish: "Abrigar", maya: "Teep’, baal." },
+            { spanish: "Abrigo", maya: "Nook’il ke’el." },
+            { spanish: "Abrir", maya: "Je’." },
+            { spanish: "Abrochar", maya: "k’aal." },
+            { spanish: "Abrumar", maya: "Nak óol." },
+            { spanish: "Absceso", maya: "Chu’uchum." },
+            { spanish: "Absorber", maya: "Xuuch, chu’uch." },
+            { spanish: "Abstracto", maya: "Ma’ chika’ani’, istikyaj u na’ata’al." },
+            { spanish: "Abuchear", maya: "Awat t’aan." },
+            { spanish: "Abuelo", maya: "Nool, chiich." },
+            { spanish: "Abultar", maya: "Tuchkiin." },
+            { spanish: "Abundancia", maya: "Ya’ab." },
+            { spanish: "Abundar", maya: "Ya’abtal." },
+            { spanish: "Aburrir", maya: "Nak óol." },
+            { spanish: "Acá", maya: "Waye’, weye’." },
+            { spanish: "Acabar", maya: "Ts’o’ok, xu’ul." },
+            { spanish: "Academia", maya: "U najil tu’ux ku much’tal máako’ob u yojelo’ob ya’ab ba’al." },
+            { spanish: "Acaecer", maya: "Úuchul." },
+            { spanish: "Acampar", maya: "U p’áatal máak je’elel wáa wenel ti’ k’aax." },
+            { spanish: "Acanalar", maya: "Meen yáam." },
+            { spanish: "Acaparar", maya: "méek’táan." },
+            { spanish: "Acariciar", maya: "Báay." },
+            { spanish: "Acarrear", maya: "Púut." },
+            { spanish: "Acaso", maya: "Bey wale’." },
+            { spanish: "Acatar", maya: "U’uy t’aan." },
+            { spanish: "Acaudalado", maya: "Ayik’al." },
+            { spanish: "Acceder", maya: "óot." },
+            { spanish: "Acceso", maya: "Bej, jool." },
+            { spanish: "Accidentar", maya: "U yúuchul loob." },
+            { spanish: "Accidente", maya: "Loob." },
+            { spanish: "Acción", maya: "Péek." },
+            { spanish: "Acechar", maya: "Ch’eeneb." },
+            { spanish: "Acedar", maya: "Paj, su’uts’." },
+            { spanish: "Acedía", maya: "Chujkal." },
+            { spanish: "Acometer", maya: "K’óoch." },
+            { spanish: "Acomodar", maya: "Tsool." },
+            { spanish: "Acompañante", maya: "Láak’inaj." },
+            { spanish: "Acompañar", maya: "Láak’in." },
+            { spanish: "Acondicionar", maya: "Utskin." },
+            { spanish: "Aconsejar", maya: "Tsol xikin." },
+            { spanish: "Acontecer", maya: "Úuchul." },
+            { spanish: "Acoplar", maya: "Nuup." },
+            { spanish: "Acordar", maya: "K’a’ajal ba’al." },
+            { spanish: "Acorralar", maya: "K’aal." },
+            { spanish: "Acortar", maya: "Kóomkin." },
+            { spanish: "Acosar", maya: "Áalkab paach." },
+            { spanish: "Acostar", maya: "Chital, chitaj." },
+            { spanish: "Acotar", maya: "Koot." },
+            { spanish: "Acre", maya: "Si’ij." },
+            { spanish: "Acrecentar", maya: "Ya’abkun, nojochkun." },
+            { spanish: "Acreditar", maya: "Uts." },
+            { spanish: "Acreedor", maya: "Máak ku ts’ik je’ ba’axak p’axbile’." },
+            { spanish: "Acribillar", maya: "Ts’ots’op loom." },
+            { spanish: "Acróbata", maya: "Máak ku xíinbal yóok’ol junt’i’in suum." },
+            { spanish: "Acta", maya: "Ju’un ku ts’íibta’al tu yóo’lal junp’éel ket t’aan ichil junmúuch’ máako’ob." },
+            { spanish: "Activar", maya: "T’aab, joop." },
+            { spanish: "Activo", maya: "Sáak’óol, t’a’aj." },
+            { spanish: "Acto", maya: "Beet, meent." },
+            { spanish: "Actuación", maya: "Beet, meent." },
+            { spanish: "Actualizar", maya: "Túunbenkun." },
+            { spanish: "Actuar", maya: "Meentbil je’ ba’axake’." },
+            { spanish: "Acuario", maya: "U un’ukul tu’ux ku ts’a’abal kayo’ob." },
+            { spanish: "Acuartelar", maya: "U k’a’alaj waacho’ob tu majilo’ob." },
+            { spanish: "Acuático", maya: "Ja’il." },
+            { spanish: "Acuchillar", maya: "Loom." },
+            { spanish: "Acudir", maya: "Taal, náats’al, biin." },
+            { spanish: "Acuerdo", maya: "Ch’a’ nu’uk tumen tuláakal." },
+            { spanish: "Acumular", maya: "Mool, muuch’." },
+            { spanish: "Acuñar", maya: "No’oxkin." },
+            { spanish: "Acurrucarse", maya: "Mochtal." },
+            { spanish: "Acusar", maya: "Tak pool, tak jo’ol." },
+            { spanish: "Achacoso", maya: "Mantats’ k’oja’an." },
+            { spanish: "Achatar", maya: "Yuuch’." },
+            { spanish: "Achiote", maya: "K’uxub, kiwi’." },
+            { spanish: "Achocar", maya: "Chook’." },
+            { spanish: "Adán", maya: "Yáax xiib yóok’ol kaab." },
+            { spanish: "Adaptar", maya: "Tsool." },
+            { spanish: "Adecuar", maya: "Éet k’alap." },
+            { spanish: "Adelantar", maya: "Táanilkun." },
+            { spanish: "Adelgazar", maya: "Bek’echkun." },
+            { spanish: "Ademán", maya: "Béech’ k’ab, éets’ p’a’as." },
+            { spanish: "Además", maya: "Bey xan." },
+            { spanish: "Adentro", maya: "Ich, ichil." },
+            { spanish: "Adeudar", maya: "P’aax." },
+            { spanish: "Adeudo", maya: "P’aax." },
+            { spanish: "Adherir", maya: "Taak’." },
+            { spanish: "Adiestrar", maya: "Ka’ansaj, suukkin." },
+            { spanish: "Adinerado", maya: "Ayik’al." },
+            { spanish: "Adivinar", maya: "Na’at." },
+            { spanish: "Adivino", maya: "(J)na’at, (x)na’at." },
+            { spanish: "Admirable", maya: "Jak’ óolal." },
+            { spanish: "Admirar", maya: "Jak’ óol." },
+            { spanish: "Admitir", maya: "K’aam." },
+            { spanish: "Adobado", maya: "Makkuum, áakat." },
+            { spanish: "Adobar", maya: "Pak’ xa’ak’." },
+            { spanish: "Adobe", maya: "Pak’ lu’um." },
+            { spanish: "Adobo", maya: "Pak’ xa’ak’." },
+            { spanish: "Adoctrinar", maya: "Ka’anbes." },
+            { spanish: "Adolescencia", maya: "Táankelemil, lo’bayanil." },
+            { spanish: "Adolescente", maya: "Táankelem." },
+            { spanish: "Adoptar", maya: "Ch’a’." },
+            { spanish: "Adorar", maya: "Yaakun." },
+            { spanish: "Adormecer", maya: "Weens." },
+            { spanish: "Adornar", maya: "Jats’utskin, jats’utskun." },
+            { spanish: "Adueñarse", maya: "Tia’altal." },
+            { spanish: "Adular", maya: "Leets’." },
+            { spanish: "Adulterar", maya: "Jeel, k’eex." },
+            { spanish: "Adulterio", maya: "Okol ts’iis." },
+            { spanish: "Adulto", maya: "Nojoch máak, nojoch wíinik." },
+            { spanish: "Advertir", maya: "A’al." },
+            { spanish: "Aerolito", maya: "Chamal xnuuk." },
+            { spanish: "Afanar", maya: "Meyaj yéetel ki’imak óolal." },
+            { spanish: "Afecto", maya: "Yaakun." },
+            { spanish: "Afeitar", maya: "Ts’iik." },
+            { spanish: "Afeminado", maya: "Ch’upu xiib." },
+            { spanish: "Afición", maya: "Uts tu yich, uts tu t’aan." },
+            { spanish: "Afilar", maya: "Ja’." },
+            { spanish: "Afinidad", maya: "Chika’anil." },
+            { spanish: "Afirmar", maya: "Jaaj, jaajkun." },
+            { spanish: "Aflcción", maya: "Yaj óol." },
+            { spanish: "Afligir", maya: "Oks yaj." },
+            { spanish: "Aflojar", maya: "Cha’, waach’." },
+            { spanish: "Afónico", maya: "Ma’as kaal." },
+            { spanish: "Afuera", maya: "Táankab, paachil." },
+            { spanish: "Agachar", maya: "T’uchkin." },
+            { spanish: "Agarrar", maya: "Ch’a’, maach, cháach." },
+            { spanish: "Agave", maya: "Kij, kiiw." },
+            { spanish: "Agazapar", maya: "Mot’kin." },
+            { spanish: "Ágil", maya: "Péeka’an, sáak’óol." },
+            { spanish: "Agitador", maya: "Máak ku káajsik ba’ate’il." },
+            { spanish: "Agitar", maya: "Chiik, yúuk." },
+            { spanish: "Aglomerar", maya: "Much’kiin, mulkiin." },
+            { spanish: "Aglutinar", maya: "Taak’, tsaay." },
+            { spanish: "Agobiar", maya: "Ka’anal." },
+            { spanish: "Agonía", maya: "Pa’ muuk’." },
+            { spanish: "Agonizar", maya: "Tu’upul, muk’yaj." },
+            { spanish: "Agorar", maya: "Tomoj chi’, tomox chi’." },
+            { spanish: "Agotar", maya: "Xuup, ts’o’ok." },
+            { spanish: "Agradar", maya: "ki’imakkun óol." },
+            { spanish: "Agrario", maya: "(J)k’áaxil, (X)k’áaxil." },
+            { spanish: "Agravar", maya: "Yaajtal." },
+            { spanish: "Agravio", maya: "A’alaj ba’al, pooch’il." },
+            { spanish: "Agredir", maya: "Loox, ba’ate’el." },
+            { spanish: "Agregar", maya: "Ya’abkun, nuup’." },
+            { spanish: "Agresivo", maya: "(J)kaxan ba’ate’el." },
+            { spanish: "Agriar", maya: "Su’uts’kin, pajkun." },
+            { spanish: "Agricultor", maya: "(J)kolnáal, (x)kolnáal, meeji k’áax." },
+            { spanish: "Agrio", maya: "Su’uts’, paj." },
+            { spanish: "Agro", maya: "K’áaxil." },
+            { spanish: "Agrura", maya: "Chujkal." },
+            { spanish: "Agua", maya: "Ja’." },
+            { spanish: "Aguacate", maya: "Oom, oon." },
+            { spanish: "Aguacero", maya: "Cháak." },
+            { spanish: "Aguada", maya: "Áak’al, áak’al che’." },
+            { spanish: "Aguador", maya: "(J)bisaj ja’." },
+            { spanish: "Aguantar", maya: "Muk’yaj." },
+            { spanish: "Aguar", maya: "Júulja’, ja’ach’kun." },
+            { spanish: "Agüero", maya: "Tomoj chi’, tomok chi’, tomox chi’." },
+            { spanish: "Aguijón", maya: "Yaach." },
+            { spanish: "Aguililla", maya: "Koos." },
+            { spanish: "Aguja", maya: "Púuts’. Kayche’." },
+            { spanish: "Agujerear", maya: "Po’pot, jo’jol." },
+            { spanish: "Agujero", maya: "Jool." },
+            { spanish: "Agutí", maya: "Tsuub." },
+            { spanish: "Ahí", maya: "Te’elo’." },
+            { spanish: "Ahogar", maya: "Bul ni’, kup iik’." },
+            { spanish: "Ahora", maya: "Bejla’e’." },
+            { spanish: "Ahorcajar", maya: "Jets’ méek’." },
+            { spanish: "Ahorcarse", maya: "Jektal." },
+            { spanish: "Ahorcar", maya: "Jich’ kaal, bits’ kaal." },
+            { spanish: "Ahorrar", maya: "Líik’es, ta’ak." },
+            { spanish: "Ahorro", maya: "T’áal k’u’." },
+            { spanish: "Ahumar", maya: "Buuts’kin." },
+            { spanish: "Ahuyentar", maya: "P’u’us, toojol." },
+            { spanish: "Aire", maya: "Iik’." },
+            { spanish: "Aislar", maya: "P’aat, jóok’es." },
+            { spanish: "Ajonjolí", maya: "Sikil p’uus." },
+            { spanish: "Ajustar", maya: "P’elechkun, p’iiskun." },
+            { spanish: "Ajusticiar", maya: "Kiims, xot k’iin." },
+            { spanish: "Ala", maya: "Xiik’." },
+            { spanish: "Alabar", maya: "Ki’iki’ t’aan." },
+            { spanish: "Alacrán", maya: "Síina’an." },
+            { spanish: "Álamo", maya: "Kóopo’." },
+            { spanish: "Alargar", maya: "Chowakkin, chowakkun." },
+            { spanish: "Alarido", maya: "Táaj awat, chi’ibal ok’ol." },
+            { spanish: "Alba", maya: "Píik’ sáas, sáastal." },
+            { spanish: "Albahaca", maya: "(silvestre) (x)kakaltuun." },
+            { spanish: "Albañil", maya: "(J)meen pak’." },
+            { spanish: "Albarrada", maya: "Koot." },
+            { spanish: "Alborotar", maya: "Awat, juum." },
+            { spanish: "Alcalde", maya: "Jalach wíinik u nojchil kaaj." },
+            { spanish: "Alcancía", maya: "U nu’ukulil u ta’aka’al taak’in." },
+            { spanish: "Alcanzar", maya: "Chuuk, nak’paach." },
+            { spanish: "Alcohólico", maya: "Máak sen ya’ab u káaltal." },
+            { spanish: "Alcoholismo", maya: "Káaltalil." },
+            { spanish: "Aldaba", maya: "K’alab." },
+            { spanish: "Aldea", maya: "Chan kaaj." },
+            { spanish: "Alegrar", maya: "Ki’imakkun óol." },
+            { spanish: "Alegría", maya: "Ki’imak óol, ki’imak óolal." },
+            { spanish: "Alejar", maya: "Náachkun." },
+            { spanish: "Alentar", maya: "Ch’a’ iik’, múus iik’, ch’a’ óol." },
+            { spanish: "Alepusa", maya: "P’aay, p’aj." },
+            { spanish: "Alfabetización", maya: "Ka’ansaj xook yéetel ts’íib." },
+            { spanish: "Alfabetizar", maya: "Ka’ansaj xook yéetel ts’íib." },
+            { spanish: "Alfarería", maya: "U kúuchil tu’ux ku ko’onol wa ku meyajta’al k’at." },
+            { spanish: "Alfarero", maya: "Máak ku meyajtik k’at." },
+            { spanish: "Alfiler", maya: "Púuts’ yan u pool." },
+            { spanish: "Alforza", maya: "Wuuts’il nook’." },
+            { spanish: "Algodón", maya: "Taman, piits’." },
+            { spanish: "Alianza", maya: "Much’bal, much’baj." },
+            { spanish: "Aliento", maya: "Múus iik’, yooxol chi’." },
+            { spanish: "Aligerar", maya: "Séebkun, lep’ óol." },
+            { spanish: "Alimentación", maya: "Tséen janal." },
+            { spanish: "Alimentar", maya: "Tséen, tsaa janal." },
+            { spanish: "Alimento", maya: "janal, o’och." },
+            { spanish: "Alinear", maya: "Tojkin." },
+            { spanish: "Alisar", maya: "Báay, ji’, yúul." },
+            { spanish: "Alistar", maya: "Líik’es." },
+            { spanish: "Aljibe", maya: "Chuulu’ ja’, chultun." },
+            { spanish: "Alma", maya: "Pixan, óol." },
+            { spanish: "Almacenar", maya: "Ta’ak." },
+            { spanish: "Almíbar", maya: "Ch’ujuk." },
+            { spanish: "Almidón", maya: "Cha’ak." },
+            { spanish: "Almizcle", maya: "P’u’us." },
+            { spanish: "Almohada", maya: "K’áan pool, k’áan jo’ol." },
+            { spanish: "Almorzar", maya: "Janal, janaj." },
+            { spanish: "Almud", maya: "Muut." },
+            { spanish: "Almuerzo", maya: "Janal, janaj, o’och." },
+            { spanish: "Alocar", maya: "Chokokin pool." },
+            { spanish: "Alojar", maya: "K’am u’ula’." },
+            { spanish: "Alpargata", maya: "Xanab, xanab k’éewel." },
+            { spanish: "Alquilar", maya: "Ts’aa majan." },
+            { spanish: "Alquiler", maya: "U tojol majan." },
+            { spanish: "Alrededor", maya: "Bak’ paach." },
+            { spanish: "Alterar", maya: "K’eex, jeel." },
+            { spanish: "Alteza", maya: "U ka’analil." },
+            { spanish: "Altillo", maya: "Búu’tun, káakab." },
+            { spanish: "Altivo", maya: "Ka’anal óol." },
+            { spanish: "Alto", maya: "Ka’anal, ka’anaj." },
+            { spanish: "Altura", maya: "U ka’analil." },
+            { spanish: "Aludir", maya: "K’a’as." },
+            { spanish: "Alumbrar", maya: "Sáaskun, juul." },
+            { spanish: "Alumno", maya: "Je’ máaxak ku bin tu najil xook utia’al u kaanbale’." },
+            { spanish: "Alzar", maya: "Ch’úuy, líik’es." },
+            { spanish: "Allá", maya: "Tolo’, te’elo’, ti’i." },
+            { spanish: "Allanar", maya: "Táaxkun." },
+            { spanish: "Allí", maya: "Ti’i, te’elo’, tolo’." },
+            { spanish: "Amabilidad", maya: "Utsil." },
+            { spanish: "Amable", maya: "Uts." },
+            { spanish: "Amado", maya: "Yaakuna’an, óota’an." },
+            { spanish: "Amaestrado", maya: "Ka’anbesa’an." },
+            { spanish: "Amaestrar", maya: "Ka’anbes." },
+            { spanish: "Amamantar", maya: "Ts’aa chu’uch." },
+            { spanish: "Amanecer", maya: "Píik’il, sáastaj." },
+            { spanish: "Amansar", maya: "Suukkin." },
+            { spanish: "Amante", maya: "(f)Weey, (x)k’eech." },
+            { spanish: "Amapola", maya: "(x)K’uyche’." },
+            { spanish: "Amar", maya: "Yaakun." },
+            { spanish: "Amargar", maya: "K’áajkun." },
+            { spanish: "Amargo", maya: "K’áaj." },
+            { spanish: "Amarillarse", maya: "k’aank’antal,k’aank’anchajal." },
+            { spanish: "Amarillo", maya: "k’aank’an." },
+            { spanish: "Amarrar", maya: "K’aax." },
+            { spanish: "Amarre", maya: "K’aaxil, k’aaxij." },
+            { spanish: "Amasar", maya: "Ya’ach’, xa’ak’." },
+            { spanish: "Ambición", maya: "Ts’íibol, poochtal." },
+            { spanish: "Ambicionar", maya: "Ts’iibol, poochtal." },
+            { spanish: "Ambidextro", maya: "Ka’amatil k’ab." },
+            { spanish: "Ambiente", maya: "Tuláakal ba’al yaan yóok’ol kaab." },
+            { spanish: "Ambos", maya: "Tu ka’atulil." },
+            { spanish: "Ambular", maya: "Xíinbal, xíinbaj." },
+            { spanish: "Amenazar", maya: "Sajakkun, ts’aa sajak." },
+            { spanish: "Amenizar", maya: "Ki’ óol." },
+            { spanish: "Amígdala", maya: "P’aakil kaal, bu’ulil kaal." },
+            { spanish: "Amistad", maya: "Uts bisbaj yéetel je’ máaxake’." },
+            { spanish: "Amnistía", maya: "U sa’asa’al u si’ipil máak." },
+            { spanish: "Amo", maya: "Yuum, yuumil, ts’uul." },
+            { spanish: "Amodorrarse", maya: "Chich wenel, t’uubul u wenel máak." },
+            { spanish: "Amoldar", maya: "U beeta’al junp’éel ba’al je’ex u nu’ukulil tu’ux ts’a’abale’." },
+            { spanish: "Amonestar", maya: "K’eey, táaj t’aan." },
+            { spanish: "Amontonar", maya: "Mulkin, muchi’kin." },
+            { spanish: "Amor", maya: "Yaaj." },
+            { spanish: "Amoratarse", maya: "Éek’kume’ental, ée’puk’e’ental." },
+            { spanish: "Amordazar", maya: "K’ax chi’." },
+            { spanish: "Amortajar", maya: "Tep’ kimen." },
+            { spanish: "Amparar", maya: "Kalan, kanan." },
+            { spanish: "Ampliar", maya: "Kóochkin, nojochkin." },
+            { spanish: "Amplificar", maya: "Nojochkin, kóochkin." },
+            { spanish: "Amplio", maya: "Kóoch." },
+            { spanish: "Ampolla", maya: "Xaak, p’ool." },
+            { spanish: "Amputación", maya: "Xoot, luk’s." },
+            { spanish: "Amputar", maya: "Xoot, xoot’." },
+            { spanish: "Amurallar", maya: "K’aal bak’ paach." },
+            { spanish: "Analfabetismo", maya: "Máako’ob ma’ u yojlo’ob xooki’." },
+            { spanish: "Analfabeto", maya: "Máak ma’ u yojel xook mix ts’íibi’." },
+            { spanish: "Anatomía", maya: "U xookil u wíinklil máak." },
+            { spanish: "Anca", maya: "P’u’uk iit, bak’el iit." },
+            { spanish: "Anciano", maya: "Ch’ija’an." },
+            { spanish: "Ancho", maya: "Kóoch." },
+            { spanish: "Anchura", maya: "Kóoch u táan." },
+            { spanish: "Andar", maya: "Xíinbal, xíinbaj, máan." },
+            { spanish: "Anegar", maya: "Buul, búulul." },
+            { spanish: "Anexar", maya: "Taak’, nuup." },
+            { spanish: "Angosto", maya: "Un’ut’." },
+            { spanish: "Ángulo", maya: "Ti’its’, tu’uk’." },
+            { spanish: "Anhelar", maya: "Ts’íibol, yaanyan." },
+            { spanish: "Anidar", maya: "K’u’ankil, meen k’u’." },
+            { spanish: "Ánima", maya: "Pixan, pixam, óol." },
+            { spanish: "Animal", maya: "Ba’alche’." },
+            { spanish: "Animar", maya: "Lep’ óol, lep’ óolal." },
+            { spanish: "Ánimo", maya: "Óol." },
+            { spanish: "Aniquilar", maya: "Xu’uls, chéejs." },
+            { spanish: "Aniversario", maya: "Noj k’iin, k’iin k’aaba’." },
+            { spanish: "Ano", maya: "It, mool, chuun." },
+            { spanish: "Anoche", maya: "Áak’abjil, ok’onjij, o’niak." },
+            { spanish: "Anochecer", maya: "Áak’abtal, ée’joch’e’ental, ée’same’ental." },
+            { spanish: "Anolar", maya: "Nóol." },
+            { spanish: "Anona", maya: "Óop, poox." },
+            { spanish: "Anotar", maya: "Ts’íib." },
+            { spanish: "Ansia", maya: "Taak, ts’íibol, k’áat." },
+            { spanish: "Antaño", maya: "Úuchben." },
+            { spanish: "Anteanoche", maya: "Áak’ab ka’oje, áak’ab ka’awjej." },
+            { spanish: "Anteayer", maya: "Ka’oje, ka’awje." },
+            { spanish: "Antebrazo", maya: "K’ab." },
+            { spanish: "Anteceder", maya: "K’ab." },
+            { spanish: "Anteponer", maya: "Bin táanil." },
+            { spanish: "Anterior", maya: "Táanil." },
+            { spanish: "Antes", maya: "Táanil, táanij, yáax." },
+            { spanish: "Anticipar", maya: "Yáaxkun, paybe’enkun." },
+            { spanish: "Antifaz", maya: "U piixil ich." },
+            { spanish: "Antigüedad", maya: "Úuchbenil." },
+            { spanish: "Antiguo", maya: "Úuchben, laab." },
+            { spanish: "Antojo", maya: "Ts’íibol, pooch." },
+            { spanish: "Antorcha", maya: "Taj che’." },
+            { spanish: "Anudar", maya: "K’aax, mook, jook’." },
+            { spanish: "Anular", maya: "Xu’uls, ts’o’oks." },
+            { spanish: "Anunciar", maya: "K’a’ay, a’al." },
+            { spanish: "Anzuelo", maya: "Lutsub, jok’ob." },
+            { spanish: "Añadir", maya: "Tsaay." },
+            { spanish: "Añejar", maya: "Úuchbental." },
+            { spanish: "Añejo", maya: "Úuchben, laab." },
+            { spanish: "Añicos", maya: "Xéexet’al." },
+            { spanish: "Añil", maya: "Ch’ooj." },
+            { spanish: "Año", maya: "Ja’ab." },
+            { spanish: "Apaciguar", maya: "Jets’kun." },
+            { spanish: "Apachurrar", maya: "Peech’, pupuch’, yaach’." },
+            { spanish: "Apadrinar", maya: "Máak ku bisik juntúul chanpaal ok ja’ wáa juntúul máak utia’al u ts’o’okol u beel." },
+            { spanish: "Apagar", maya: "Tuup." },
+            { spanish: "Apalear", maya: "Nóok jaats’, táaj jaats’." },
+            { spanish: "Apañar", maya: "Maach, ch’a’." },
+            { spanish: "Aparador", maya: "U nu’ukul tu’ux ku ye’esa’aj koonol." },
+            { spanish: "Aparato", maya: "Nu’ukul." },
+            { spanish: "Aparear", maya: "Nuup, ts’iis." },
+            { spanish: "Aparecer", maya: "Chíikpajal, jóok’ol, tíip’il." },
+            { spanish: "Aparentar", maya: "Chéen tu menkubaj, chéen tu tuus." },
+            { spanish: "Apartar", maya: "Jaats, juuts’, kóol." },
+            { spanish: "Aparte", maya: "Junpáay." },
+            { spanish: "Apasionar", maya: "Uts tu yich." },
+            { spanish: "Apaste", maya: "Káat." },
+            { spanish: "Apatía", maya: "Ma’ óolal." },
+            { spanish: "Apedrear", maya: "Ch’iin ku meenta’al yéetel tuunich." },
+            { spanish: "Apenar", maya: "Yajkun óol, subtal." },
+            { spanish: "Apenas", maya: "Istikyaj, istakyaj." },
+            { spanish: "Apéndice", maya: "U ni’ polok chooch." },
+            { spanish: "Apertura", maya: "Je’; Chúunpajal, káajal." },
+            { spanish: "Apesgar", maya: "Peets’, ts’aal." },
+            { spanish: "Apestar", maya: "Tu’." },
+            { spanish: "Apestoso", maya: "Tu’." },
+            { spanish: "Apetecer", maya: "Ts’íibol, taak, k’áat." },
+            { spanish: "Apetencia", maya: "Máak taak u beetik je’ ba’axake’." },
+            { spanish: "Apetito", maya: "Taakil janal." },
+            { spanish: "Apicultor", maya: "Máak ku meyajtik kaab." },
+            { spanish: "Apicultura", maya: "Meyajil kaab, kanáanil kaab, kaláanil kaab." },
+            { spanish: "Apisonar", maya: "Koj lu’um wáa bej." },
+            { spanish: "Aplanar", maya: "Táaxkun." },
+            { spanish: "Aplastr", maya: "Peech’, puuch, yaach’, maax." },
+            { spanish: "Aplaudir", maya: "Papax k’ab, lalaj k’ab." },
+            { spanish: "Aplauso", maya: "Papax k’ab." },
+            { spanish: "Aplicar", maya: "Ts’aabil ba’al yóok’ol uláak’." },
+            { spanish: "Apodo", maya: "K’aaba’." },
+            { spanish: "Apolillar", maya: "U k’uux yik’el che’ wáa nook’." },
+            { spanish: "Aporrear", maya: "P’uuch." },
+            { spanish: "Aportar", maya: "Ts’aa." },
+            { spanish: "Aposentar", maya: "Ts’aa tu’ux wenel máak." },
+            { spanish: "Aposento", maya: "U k’áasil naj." },
+            { spanish: "Apostar", maya: "U buul máak yéetel taak’in." },
+            { spanish: "Apoyar", maya: "Jets’kun, nakkun." },
+            { spanish: "Apoyo", maya: "Tóojche’, áantaj." },
+            { spanish: "Apreciar", maya: "Yaakun, yaabil." },
+            { spanish: "Aprecio", maya: "Yaakunaj." },
+            { spanish: "Aprehender", maya: "Chuuk, maach, cháach." },
+            { spanish: "Aprehensión", maya: "Chuuk." },
+            { spanish: "Aprender", maya: "Kaanbal, kaanbal." },
+            { spanish: "Aprendiz", maya: "(J) kaanbal." },
+            { spanish: "Apresar", maya: "Chuuk, maach, peets’." },
+            { spanish: "Apresurar", maya: "Chichkun, séebkun, lep’ óol." },
+            { spanish: "Apretón", maya: "Chich maach, kan maach." },
+            { spanish: "Aprisa", maya: "Séebal, tu séebal." },
+            { spanish: "Aprisionar", maya: "K’aal." },
+            { spanish: "Aprobación", maya: "Jaaj, jaajkun." },
+            { spanish: "Aprobar", maya: "Jaaj, jaajkun." },
+            { spanish: "Apropiar", maya: "Tia’alint, ch’a’." },
+            { spanish: "Aprovechar", maya: "K’abéetkun, k’a’ana’ankun." },
+            { spanish: "Aproximación", maya: "Náats’al, júuts’ul." },
+            { spanish: "Aproximar", maya: "Juuts’, naats’." },
+            { spanish: "Apto", maya: "Ma’alob." },
+            { spanish: "Apuesta", maya: "Buul." },
+            { spanish: "Apuntalar", maya: "Táak che’, tóojche’." },
+            { spanish: "Apuntar", maya: "Tuuch’ub, e’es." },
+            { spanish: "Apuñalar", maya: "Loom." },
+            { spanish: "Apurar", maya: "Séebkun, lep’ óol, chichkun." },
+            { spanish: "Aquél", maya: "Lelo’." },
+            { spanish: "Aquí", maya: "Te’ela’, waye’, weye’." },
+            { spanish: "Aquietar", maya: "Jets’kúun." },
+            { spanish: "Araña", maya: "Am." },
+            { spanish: "Arañar", maya: "La’ach." },
+            { spanish: "Árbol", maya: "Che’." },
+            { spanish: "Arbusto", maya: "Che’ ku jóok’ol u k’ab tak tu chuun." },
+            { spanish: "Arco", maya: "Chéel." },
+            { spanish: "Archivar", maya: "Ta’ak." },
+            { spanish: "Archivo", maya: "U kúuchil tu’ux ku ta’aka’al wáa ku líi’sa’al ju’uno’ob." },
+            { spanish: "Arder", maya: "Elel." },
+            { spanish: "Ardilla", maya: "Ku’uk, p’eex." },
+            { spanish: "Ardor", maya: "Jach chokoj, elel." },
+            { spanish: "Arena", maya: "U lu’umil k’áa’náab." },
+            { spanish: "Arete", maya: "Tuup." },
+            { spanish: "Árido", maya: "Bóoj tikin." },
+            { spanish: "Arisco", maya: "K’o’ox." },
+            { spanish: "Aristócrata", maya: "Ayik’al, jalach wíinikil." },
+            { spanish: "Armadillo", maya: "Weech." },
+            { spanish: "Armazón", maya: "Wíinkil, wíinklil." },
+            { spanish: "Aroma", maya: "ki’bok." },
+            { spanish: "Arquear", maya: "Wuuts’, looch, p’uun." },
+            { spanish: "Arraigar", maya: "Táabal, tak’moots." },
+            { spanish: "Arrancar", maya: "Jook, joots’, t’ook." },
+            { spanish: "Arrasar", maya: "Táaxkun, míis." },
+            { spanish: "Arrastrar", maya: "Jiil, kóol." },
+            { spanish: "Arrear", maya: "K’a." },
+            { spanish: "Arrebato", maya: "Náay óolal." },
+            { spanish: "Arreglar", maya: "Utskin, tsool." },
+            { spanish: "Arrendar", maya: "Ts’aa majan." },
+            { spanish: "Arrepentirse", maya: "K’ex óol." },
+            { spanish: "Arriba", maya: "Yóok’ol, yóok’olal, ka’anal." },
+            { spanish: "Arriesgar", maya: "Ts’aa tu k’aasilil." },
+            { spanish: "Arrimar", maya: "Naats’." },
+            { spanish: "Arrojar", maya: "Puul." },
+            { spanish: "Arroyo", maya: "Áak’al, ja’." },
+            { spanish: "Arte", maya: "Ma’alob meej." },
+            { spanish: "Artesano", maya: "Máak ku beeta’al ba’al yéetel u k’ab." },
+            { spanish: "Articulación", maya: "Múuch’kach, muuch’k’aach." },
+            { spanish: "Artículo", maya: "Ba’al, nu’ukul." },
+            { spanish: "Artillero", maya: "Máak ku ts’a’abak juum ti’ ts’o’ono’ob." },
+            { spanish: "Asadero", maya: "U kúuchil tu’ux ku ts’a’abal beeta’al ba’al chéen yéetel k’áak’." },
+            { spanish: "Asar", maya: "Asaj, xóol, ts’ook." },
+            { spanish: "Ascender", maya: "Nakal, k’aal." },
+            { spanish: "Asco", maya: "Su’ut." },
+            { spanish: "Aseo", maya: "Jich’ k’e’ex, jeel, ée’." },
+            { spanish: "Aseverar", maya: "Jaajkun." },
+            { spanish: "Asfixiar", maya: "Kup iik’." },
+            { spanish: "Así", maya: "Beey, beeyo’." },
+            { spanish: "Asiento", maya: "Kuuch, kúuchil." },
+            { spanish: "Asistente", maya: "Áantaj, meyaj." },
+            { spanish: "Asistir", maya: "Náats’al." },
+            { spanish: "Asombrar", maya: "Jak’ óol." },
+            { spanish: "Asombro", maya: "Jak’ óolal." },
+            { spanish: "Asomar", maya: "Jóok’ol, ye’es." },
+            { spanish: "Aspearse", maya: "K’aasil, yajk’ab." },
+            { spanish: "Aspirar", maya: "Ts’íibol, taak." },
+            { spanish: "Astilla", maya: "Xéexet’ che’." },
+            { spanish: "Astro", maya: "Éek’." },
+            { spanish: "Asumir", maya: "K’aam." },
+            { spanish: "Asunto", maya: "Ba’al, meej." },
+            { spanish: "Asustar", maya: "Sajakkun." },
+            { spanish: "Atajar", maya: "K’at." },
+            { spanish: "Ataque", maya: "K’óoch, kúuch." },
+            { spanish: "Atar", maya: "K’aax." },
+            { spanish: "Atemorizar", maya: "Sajakkun." },
+            { spanish: "Atención", maya: "Káal." },
+            { spanish: "Atento", maya: "Jool." },
+            { spanish: "Atestiguar", maya: "Jaajkun." },
+            { spanish: "Atiborrar", maya: "Chuup." },
+            { spanish: "Atípico", maya: "Ma’ suuk." },
+            { spanish: "Atizar", maya: "To’otop." },
+            { spanish: "Atlántico", maya: "Nojoch k’áa’náab, k’áa’náab, ja’il." },
+            { spanish: "Atollar", maya: "K’altal lu’um." },
+            { spanish: "Atormentar", maya: "Muk’yaj." },
+            { spanish: "Atractivo", maya: "Jats’uts." },
+            { spanish: "Atraer", maya: "Náats’, taas." },
+            { spanish: "Atragantar", maya: "Jak’ab, ku’uchul." },
+            { spanish: "Atrancar", maya: "No’oxche’, tóojche’." },
+            { spanish: "Atrapar", maya: "Chuuk, maach." },
+            { spanish: "Atrás", maya: "Paachil, paachij." },
+            { spanish: "Atrasar", maya: "Xaankun; p’áatal paachil." },
+            { spanish: "Atravesar", maya: "K’atkun." },
+            { spanish: "Atrevido", maya: "Ko’." },
+            { spanish: "Atropellar", maya: "Jéentan, naktáan." },
+            { spanish: "Atuendo", maya: "Nook’, búuk." },
+            { spanish: "Aturdir", maya: "Sat óol." },
+            { spanish: "Auge", maya: "U jach ma’alobtal máak wáa je’ ba’axake’." },
+            { spanish: "Augurar", maya: "Tomoj chi’, tomok chi’, tomox chi’." },
+            { spanish: "Aullar", maya: "Uyok’ol chi’ibal peek’." },
+            { spanish: "Aullido", maya: "Awat yok’ol ba’alche’." },
+            { spanish: "Aumentar", maya: "Ya’abkun, nojochkun." },
+            { spanish: "Aunque", maya: "Kex." },
+            { spanish: "Auréola", maya: "Peet." },
+            { spanish: "Aurora", maya: "Tu taal u sáastal." },
+            { spanish: "Ausente", maya: "Bija’an, ma’ kula’ani’, mina’an." },
+            { spanish: "Autóctono", maya: "Wayile’, weyile’." },
+            { spanish: "Autoridad", maya: "Nojochil kaaj." },
+            { spanish: "Auxiliar", maya: "Áantaj, meyaj." },
+            { spanish: "Avasallar", maya: "P’éeks." },
+            { spanish: "Avisar", maya: "A’al, na’aj." },
+            { spanish: "Avivar", maya: "T’aab, joop, chi’ik." },
+            { spanish: "Axila", maya: "Xiik’." },
+            { spanish: "Ayer", maya: "Jóolo’jeak, jo’oljeak." },
+            { spanish: "Ayuda", maya: "Áantaj." },
+            { spanish: "Ayudar", maya: "Áant." },
+            { spanish: "Azar", maya: "Ma’ táaksa’an ba’ali’, bey táaj úuche’." },
+            { spanish: "Azotar", maya: "Jaats’." },
+            { spanish: "Azotea", maya: "Yóok’ol naj." },
+            { spanish: "Azúcar", maya: "Ch’ujuk, ch’ujuk ja’." },
+            { spanish: "Azucena", maya: "(x)Tubal." },
+            { spanish: "Azul", maya: "Ch’ooj, xamanch’ooj." },
+            { spanish: "Azuzar", maya: "Tiit." }
+        ];
+
+        // Función para capitalizar solo la primera letra.
+        function capitalizeFirstLetter(string) {
+            if (!string) return '';
+            return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+        }
+
+        // Función principal para renderizar la lista
+        function renderDictionary() {
+            const listContainer = document.getElementById('dictionary-list');
+            listContainer.innerHTML = ''; // Limpiar el mensaje de carga
+
+            DICTIONARY_DATA.forEach((item, index) => {
+                const spanishWord = capitalizeFirstLetter(item.spanish);
+
+                // 1. Creación de la tarjeta/elemento de definición
+                const card = document.createElement('div');
+                card.className = 'bg-white p-4 sm:p-5 rounded-xl shadow-lg hover:shadow-xl transition-shadow card-divider';
+                
+                // 2. Palabra en español (clickeable)
+                const spanishEl = document.createElement('h2');
+                // Añadimos un ID único para poder vincular la definición a este elemento.
+                spanishEl.id = `word-${index}`; 
+                spanishEl.className = 'spanish-word text-xl sm:text-2xl font-extrabold mb-1 select-none'; // select-none evita que el texto se seleccione al hacer clic
+                spanishEl.textContent = spanishWord;
+
+                // 3. Contenedor de la definición en maya (Inicialmente oculta)
+                const mayaContainer = document.createElement('div');
+                // Clase CSS para ocultar/mostrar con animación
+                mayaContainer.className = 'maya-definition'; 
+                mayaContainer.id = `definition-${index}`;
+
+                // 4. Contenido de la definición
+                const mayaEl = document.createElement('p');
+                mayaEl.className = 'text-base sm:text-lg text-text-primary leading-relaxed';
+                mayaEl.textContent = item.maya;
+                
+                // 5. Armar la definición dentro del contenedor
+                mayaContainer.appendChild(mayaEl);
+
+                // 6. Configurar el evento de click en la palabra en español
+                spanishEl.addEventListener('click', () => {
+                    // Alternar la clase 'visible' para mostrar u ocultar la definición
+                    mayaContainer.classList.toggle('visible');
+
+                    // Opcional: Ocultar todas las demás definiciones abiertas
+                    // document.querySelectorAll('.maya-definition.visible').forEach(def => {
+                    //     if (def.id !== mayaContainer.id) {
+                    //         def.classList.remove('visible');
+                    //     }
+                    // });
+                });
+
+                // 7. Armar la tarjeta completa
+                card.appendChild(spanishEl);
+                // El separador se moverá justo antes del contenido en maya visible
+                const divider = document.createElement('div');
+                divider.className = 'w-10 h-0.5 bg-maya-gray/50 mb-1 rounded-full';
+                
+                // Se coloca el separador dentro del contenedor oculto/visible para que aparezca con la definición.
+                mayaContainer.prepend(divider); 
+                
+                card.appendChild(mayaContainer);
+
+                listContainer.appendChild(card);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', renderDictionary);
+
+    </script>
+</body>
+</html>
