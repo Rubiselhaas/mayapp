@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reto Maya: Sabiduría Milenaria (Edición Aleatoria)</title>
+    <style>
+        :root {
+            --color-primary: #235B4E; /* Verde Selva */
+            --color-secondary: #9F2241; /* Guinda */
+            --color-accent: #BCA986; /* Arena */
+            --color-neutral: #888B8D; /* Gris */
+            --color-bg: #F4F1EA;
+            --color-white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--color-bg);
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .quiz-container {
+            background-color: var(--color-white);
+            max-width: 650px;
+            width: 100%;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border-top: 8px solid var(--color-primary);
+        }
+
+        .quiz-header {
+            background-color: var(--color-primary);
+            color: var(--color-white);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background-color: #eee;
+            width: 100%;
+        }
+
+        #progress {
+            height: 100%;
+            background-color: var(--color-secondary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .question-section {
+            padding: 30px;
+        }
+
+        .question-text {
+            font-size: 1.25rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: var(--color-primary);
+        }
+
+        .options-container {
+            display: grid;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background-color: var(--color-white);
+            border: 2px solid var(--color-accent);
+            padding: 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            color: #444;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background-color: #fcfaf5;
+            border-color: var(--color-primary);
+        }
+
+        .option-btn.correct {
+            background-color: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        .option-btn.incorrect {
+            background-color: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .feedback {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+            font-size: 0.95rem;
+            border-left: 5px solid var(--color-secondary);
+            background-color: #fff5f7;
+        }
+
+        .next-btn {
+            display: none;
+            margin: 25px auto 0;
+            padding: 12px 35px;
+            background-color: var(--color-secondary);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .next-btn:hover {
+            opacity: 0.9;
+        }
+
+        .result-screen {
+            display: none;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .result-score {
+            font-size: 3.5rem;
+            color: var(--color-secondary);
+            margin: 20px 0;
+            font-weight: bold;
+        }
+
+        .hint-text {
+            font-size: 0.85rem;
+            color: var(--color-neutral);
+            margin-bottom: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+
+<div class="quiz-container">
+    <div class="quiz-header">
+        <h2 id="question-number">Preparando desafío...</h2>
+    </div>
+    <div class="progress-bar">
+        <div id="progress"></div>
+    </div>
+
+    <div id="quiz-box" class="question-section">
+        <div id="hint" class="hint-text"></div>
+        <div id="question" class="question-text"></div>
+        <div id="options" class="options-container"></div>
+        <div id="feedback" class="feedback"></div>
+        <button id="next-button" class="next-btn">Siguiente</button>
+    </div>
+
+    <div id="result-box" class="result-screen">
+        <h2>¡Cuestionario Completado!</h2>
+        <div class="result-score" id="score-display">0/10</div>
+        <p id="result-message" style="margin-bottom: 25px; font-size: 1.1rem;"></p>
+        <button onclick="restartQuiz()" class="next-btn" style="display:inline-block;">Jugar de Nuevo</button>
+    </div>
+</div>
+
+<script>
+    // Banco de 50 preguntas
+    const allQuestions = [
+        { q: "¿Cuál es la estructura piramidal más grande del mundo maya por volumen?", options: ["El Castillo", "La Danta", "Templo IV de Tikal", "Pirámide del Adivino"], correct: 1, rationale: "La Danta en El Mirador tiene 2.8 millones de metros cúbicos.", hint: "Ubicada en la cuenca del Mirador." },
+        { q: "¿Qué nombre recibe el sistema de policultivo ancestral maya?", options: ["Chinampa", "Milpa", "Terraza", "Conuco"], correct: 1, rationale: "La milpa combina maíz, frijol y calabaza.", hint: "Todavía se practica hoy." },
+        { q: "¿En qué período ocurrió el mayor apogeo artístico y político?", options: ["Preclásico", "Clásico", "Posclásico", "Colonial"], correct: 1, rationale: "El periodo Clásico (250-900 d.C.) fue la era dorada.", hint: "Entre el 250 y el 900 d.C." },
+        { q: "¿Cuál era el título del máximo gobernante maya?", options: ["Sapa Inca", "Tlatoani", "Ajaw", "Cacique"], correct: 2, rationale: "Ajaw significa Señor o Soberano.", hint: "Considerado un ser divino." },
+        { q: "¿Cuántos días tiene el calendario ritual Tzolk'in?", options: ["365", "260", "20", "52"], correct: 1, rationale: "Es el ciclo sagrado de 260 días.", hint: "Número sagrado multiplicado por 20." },
+        { q: "¿Cómo llamaban los mayas al inframundo?", options: ["Mictlán", "Tamoanchan", "Xibalbá", "Metnal"], correct: 2, rationale: "Xibalbá era el 'lugar de miedo'.", hint: "Gobernado por los señores de la muerte." },
+        { q: "¿Qué material verde era más valioso que el oro?", options: ["Esmeralda", "Jade", "Turquesa", "Malaquita"], correct: 1, rationale: "El jade representaba la vida y el maíz.", hint: "Piedra de la realeza." },
+        { q: "¿Cuál fue la última ciudad maya en ser conquistada?", options: ["Mayapán", "Chichén Itzá", "Nojpetén", "Tayasal"], correct: 2, rationale: "Cayó en 1697 en el lago Petén Itzá.", hint: "Ubicada en una isla." },
+        { q: "¿Aproximadamente cuántos hablantes de lenguas mayas existen hoy?", options: ["1 millón", "3 millones", "Más de 7 millones", "500 mil"], correct: 2, rationale: "Entre 7 y 8 millones de personas se identifican como mayas.", hint: "Una de las etnias más grandes." },
+        { q: "¿Qué ciudad destacó por el estilo arquitectónico Puuc?", options: ["Tikal", "Palenque", "Uxmal", "Copán"], correct: 2, rationale: "Uxmal es la joya del estilo Puuc.", hint: "Famosa por sus grecas de piedra." },
+        { q: "¿Cuál es el libro sagrado de los mayas quichés?", options: ["Códice de Dresde", "Chilam Balam", "Popol Vuh", "Rabinal Achí"], correct: 2, rationale: "Narra la creación del mundo y el hombre.", hint: "Libro del Consejo." },
+        { q: "¿Qué deidad maya está asociada con la lluvia?", options: ["Itzamná", "Chaak", "Kukulkán", "Ixchel"], correct: 1, rationale: "Chaak se representa con una nariz larga.", hint: "Invocado para las cosechas." },
+        { q: "¿Cuál era la función principal de los sacbéob?", options: ["Canales de riego", "Calzadas blancas", "Muros de defensa", "Tumbas reales"], correct: 1, rationale: "Eran caminos pavimentados que unían ciudades.", hint: "Literalmente 'camino blanco'." },
+        { q: "¿Cómo se llama el sistema de escritura maya?", options: ["Alfabético", "Cuneiforme", "Logosílábico", "Pictográfico"], correct: 2, rationale: "Combina signos de palabras con sonidos.", hint: "Más de 800 glifos distintos." },
+        { q: "¿Qué ciudad-estado fue la gran rival de Tikal?", options: ["Palenque", "Calakmul", "Copán", "Uxmal"], correct: 1, rationale: "Tikal y Calakmul lucharon por siglos.", hint: "La Ciudad de la Cabeza de Serpiente." },
+        { q: "¿Qué fenómeno astronómico ocurre en Chichén Itzá en los equinoccios?", options: ["Alineación lunar", "Descenso de Kukulkán", "Eclipse solar total", "Tránsito de Venus"], correct: 1, rationale: "La luz crea la sombra de una serpiente.", hint: "Ocurre en El Castillo." },
+        { q: "¿Cuál es el calendario civil maya de 365 días?", options: ["Tzolk'in", "Haab'", "Uinal", "Katún"], correct: 1, rationale: "El Haab' regía la vida cotidiana.", hint: "Cercano al año solar." },
+        { q: "¿Qué material volcánico se usaba para armas y cuchillos sacros?", options: ["Sílex", "Basalto", "Obsidiana", "Granito"], correct: 2, rationale: "La obsidiana es vidrio volcánico muy filoso.", hint: "Vidrio negro natural." },
+        { q: "¿En qué país se encuentra la ciudad de Copán?", options: ["México", "Guatemala", "Honduras", "Belice"], correct: 2, rationale: "Copán fue centro artístico en Honduras.", hint: "Famosa por su Escalinata de Jeroglíficos." },
+        { q: "¿Quién fue el gran gobernante de Palenque enterrado en el Templo de las Inscripciones?", options: ["Escudo Jaguar", "Pakal el Grande", "Pájaro Jaguar", "Humano Jaguar"], correct: 1, rationale: "K'inich Janaab' Pakal gobernó 68 años.", hint: "Su tumba es un tesoro arqueológico." },
+        { q: "¿Qué planta era usada como moneda y bebida ritual?", options: ["Maíz", "Agave", "Cacao", "Vainilla"], correct: 2, rationale: "Las semillas de cacao tenían gran valor.", hint: "Origen del chocolate." },
+        { q: "¿Qué parte del cuerpo deformaban los mayas nobles como signo de belleza?", options: ["Pies", "Cráneo", "Cuello", "Dedos"], correct: 1, rationale: "Practicaban la deformación craneal tabular.", hint: "Desde recién nacidos." },
+        { q: "¿Qué significa el término 'Puuc'?", options: ["Selva", "Montaña", "Colina", "Agua"], correct: 2, rationale: "Puuc refiere a las colinas de Yucatán.", hint: "Región geográfica." },
+        { q: "¿Qué animal era el símbolo supremo de poder y religión?", options: ["Águila", "Serpiente", "Jaguar", "Mono"], correct: 2, rationale: "El Balam (jaguar) representaba al sol nocturno.", hint: "Depredador de la selva." },
+        { q: "¿A qué deidad se asocia el Juego de Pelota?", options: ["Sol y Luna", "Gemelos Héroes", "Señores de Xibalbá", "Todos los anteriores"], correct: 3, rationale: "Era un ritual de regeneración cósmica.", hint: "Mito del Popol Vuh." },
+        { q: "¿Qué material usaban para las 'calzadas blancas'?", options: ["Mármol", "Granito", "Piedra Caliza", "Adobe"], correct: 2, rationale: "La caliza era abundante y fácil de tallar.", hint: "Roca común en la península." },
+        { q: "¿Cuántos niveles tiene el cielo en la cosmología maya?", options: ["9", "13", "7", "3"], correct: 1, rationale: "El supramundo consta de 13 capas.", hint: "Opuesto a los 9 del inframundo." },
+        { q: "¿Qué nombre recibe el sistema de cultivo en humedales?", options: ["Terrazas", "Campos elevados", "Milpa de roza", "Huertos"], correct: 1, rationale: "Permitía cultivar en zonas inundables.", hint: "Agricultura intensiva." },
+        { q: "¿Cuál es el códice maya que trata sobre profecías?", options: ["Dresde", "Madrid", "París", "Grolier"], correct: 2, rationale: "El Códice de París es de carácter ritual.", hint: "Nombre de la capital francesa." },
+        { q: "¿Qué ciudad maya se encuentra frente al Mar Caribe?", options: ["Coba", "Tulum", "Uxmal", "Edzná"], correct: 1, rationale: "Tulum era un puerto amurallado.", hint: "Famosa por su vista al mar." },
+        { q: "¿Cómo se llamaba la última capital de los mayas en Yucatán?", options: ["Izamal", "Chichén Itzá", "Mayapán", "Mérida"], correct: 2, rationale: "Mayapán dominó tras la caída de Chichén Itzá.", hint: "Fundada por los Cocom." },
+        { q: "¿Qué número es la base del sistema matemático maya?", options: ["10", "12", "20", "60"], correct: 2, rationale: "Es un sistema vigesimal.", hint: "Dedos de manos y pies." },
+        { q: "¿Qué concepto matemático 'descubrieron' antes que los europeos?", options: ["Pi", "Cero", "Raíz cuadrada", "Fracciones"], correct: 1, rationale: "Usaban la concha para representar el vacío.", hint: "Representación de la ausencia." },
+        { q: "¿Quién es la diosa de la luna y el tejido?", options: ["Ixchel", "Ixtab", "Chirakan", "Coatlicue"], correct: 0, rationale: "Ixchel es la esposa de Itzamná.", hint: "Asociada a la medicina." },
+        { q: "¿Qué causó principalmente el 'Colapso Clásico'?", options: ["Guerra nuclear", "Sequía y agotamiento", "Invasión extraterrestre", "Tsunami"], correct: 1, rationale: "Factores ecológicos y políticos combinados.", hint: "Falta de agua y comida." },
+        { q: "¿Qué ciudad tiene la 'Escalinata de los Jeroglíficos'?", options: ["Tikal", "Copán", "Bonampak", "Palenque"], correct: 1, rationale: "Es el texto jeroglífico más largo de América.", hint: "En Honduras." },
+        { q: "¿Qué color representaba el punto cardinal del Sur?", options: ["Rojo", "Blanco", "Amarillo", "Negro"], correct: 2, rationale: "Norte(Blanco), Sur(Amarillo), Este(Rojo), Oeste(Negro).", hint: "Color del sol al medio día." },
+        { q: "¿En qué ciudad se hallan los mejores murales del Clásico?", options: ["Uxmal", "Bonampak", "Yaxchilán", "Sayil"], correct: 1, rationale: "Sus tres cuartos muestran escenas de guerra.", hint: "Murales pintados." },
+        { q: "¿Qué usaban para teñir de azul sus murales?", options: ["Añil y arcilla", "Sangre", "Lapislázuli", "Frutos rojos"], correct: 0, rationale: "El 'Azul Maya' es extremadamente resistente.", hint: "Mezcla mineral y vegetal." },
+        { q: "¿Qué linaje gobernó en Mayapán?", options: ["Xiu", "Cocom", "Itzá", "Canek"], correct: 1, rationale: "Los Cocom fueron derrotados por los Xiu.", hint: "Enemigos de los Xiu." },
+        { q: "¿Cuántos glifos se han identificado aproximadamente?", options: ["100", "500", "800", "2000"], correct: 2, rationale: "Cerca de 800 signos en el catálogo principal.", hint: "Cifra cercana al mil." },
+        { q: "¿Qué es un 'Baktún'?", options: ["20 años", "144,000 días", "5,125 años", "1 año"], correct: 1, rationale: "Un ciclo de la Cuenta Larga.", hint: "Aproximadamente 400 años." },
+        { q: "¿Quién fue Rigoberta Menchú?", options: ["Una reina maya", "Nobel de la Paz", "Una diosa", "Una guerrera antigua"], correct: 1, rationale: "Activista maya quiché de Guatemala.", hint: "Premio internacional en 1992." },
+        { q: "¿Qué significa 'Teosinte'?", options: ["Dios del maíz", "Ancestro del maíz", "Bebida de cacao", "Templo de piedra"], correct: 1, rationale: "Gramínea silvestre que dio origen al maíz.", hint: "Antepasado botánico." },
+        { q: "¿Cuál era la principal función del Juego de Pelota?", options: ["Deporte de ocio", "Ritual cósmico", "Entrenamiento militar", "Juicio legal"], correct: 1, rationale: "Simbolizaba la lucha entre luz y oscuridad.", hint: "No era solo diversión." },
+        { q: "¿Qué planta sagrada es el eje del mundo (Yaxché)?", options: ["Cacao", "Ceiba", "Maíz", "Maguey"], correct: 1, rationale: "La ceiba conecta el cielo y el inframundo.", hint: "Árbol gigante." },
+        { q: "¿Qué buscaban los mayas al observar a Venus?", options: ["Amor", "Guerra y sacrificios", "Navegación", "Arte"], correct: 1, rationale: "Venus regía los tiempos de guerra.", hint: "Estrella de la mañana." },
+        { q: "¿Cómo se llamaban los campesinos tributarios?", options: ["Almehen", "Ppolm", "Pentaloob", "Yalba Uinicob"], correct: 3, rationale: "Eran el sostén de la pirámide social.", hint: "Hombre pequeño/común." },
+        { q: "¿En qué período surgió la escritura jeroglífica?", options: ["Preclásico Tardío", "Clásico Medio", "Posclásico", "Época moderna"], correct: 0, rationale: "Ya se detecta hacia el 400 a.C.", hint: "Etapa muy temprana." },
+        { q: "¿Qué país actual NO formó parte del área maya?", options: ["El Salvador", "Belice", "Panamá", "Guatemala"], correct: 2, rationale: "Panamá está fuera del área cultural maya.", hint: "País del istmo más al sur." }
+    ];
+
+    let quizQuestions = [];
+    let currentQuestion = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById("question");
+    const optionsEl = document.getElementById("options");
+    const feedbackEl = document.getElementById("feedback");
+    const nextBtn = document.getElementById("next-button");
+    const qNumberEl = document.getElementById("question-number");
+    const progressEl = document.getElementById("progress");
+    const hintEl = document.getElementById("hint");
+    const colorSecondary = "#9F2241";
+
+    function startQuiz() {
+        // Seleccionar 10 preguntas aleatorias de las 50
+        const shuffled = [...allQuestions].sort(() => 0.5 - Math.random());
+        quizQuestions = shuffled.slice(0, 10);
+        
+        currentQuestion = 0;
+        score = 0;
+        document.getElementById("quiz-box").style.display = "block";
+        document.getElementById("result-box").style.display = "none";
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        const q = quizQuestions[currentQuestion];
+        qNumberEl.innerText = `Pregunta ${currentQuestion + 1} de 10`;
+        progressEl.style.width = `${(currentQuestion / 10) * 100}%`;
+        hintEl.innerText = q.hint;
+        questionEl.innerText = q.q;
+        optionsEl.innerHTML = "";
+        feedbackEl.style.display = "none";
+        nextBtn.style.display = "none";
+
+        q.options.forEach((opt, index) => {
+            const btn = document.createElement("button");
+            btn.innerText = opt;
+            btn.classList.add("option-btn");
+            btn.onclick = () => checkAnswer(index);
+            optionsEl.appendChild(btn);
+        });
+    }
+
+    function checkAnswer(index) {
+        const q = quizQuestions[currentQuestion];
+        const buttons = optionsEl.querySelectorAll(".option-btn");
+        buttons.forEach(btn => btn.disabled = true);
+
+        if (index === q.correct) {
+            buttons[index].classList.add("correct");
+            score++;
+            feedbackEl.innerText = "¡Correcto! " + q.rationale;
+            feedbackEl.style.borderColor = "#28a745";
+            feedbackEl.style.backgroundColor = "#eafaf1";
+        } else {
+            buttons[index].classList.add("incorrect");
+            buttons[q.correct].classList.add("correct");
+            feedbackEl.innerText = "Incorrecto. " + q.rationale;
+            feedbackEl.style.borderColor = colorSecondary;
+            feedbackEl.style.backgroundColor = "#fff5f7";
+        }
+        feedbackEl.style.display = "block";
+        nextBtn.style.display = "block";
+    }
+
+    nextBtn.onclick = () => {
+        currentQuestion++;
+        if (currentQuestion < 10) {
+            loadQuestion();
+        } else {
+            showResults();
+        }
+    };
+
+    function showResults() {
+        document.getElementById("quiz-box").style.display = "none";
+        const resultBox = document.getElementById("result-box");
+        resultBox.style.display = "block";
+        progressEl.style.width = "100%";
+        document.getElementById("score-display").innerText = `${score} / 10`;
+        
+        let msg = "";
+        if (score === 10) msg = "¡Impresionante! Eres un digno heredero de la sabiduría de los Ajaw.";
+        else if (score >= 7) msg = "¡Excelente trabajo! Conoces muy bien los secretos de la selva.";
+        else if (score >= 5) msg = "Buen esfuerzo, pero aún quedan misterios por descubrir en las estelas.";
+        else msg = "Parece que necesitas consultar más a los escribas. ¡Inténtalo de nuevo!";
+        
+        document.getElementById("result-message").innerText = msg;
+    }
+
+    function restartQuiz() {
+        startQuiz();
+    }
+
+    // Iniciar al cargar
+    window.onload = startQuiz;
+</script>
+
+</body>
+</html>
