@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historia y Cultura Maya</title>
+    <style>
+        :root {
+            --color-primary: #235B4E; /* Verde */
+            --color-secondary: #9F2241; /* Guinda */
+            --color-accent: #BCA986; /* Arena */
+            --color-neutral: #888B8D; /* Gris */
+            --color-light: #F9F7F2;
+            --color-dark: #1a1a1a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: var(--color-light);
+            color: var(--color-dark);
+            padding-bottom: 50px;
+        }
+
+        header {
+            background-color: var(--color-primary);
+            color: white;
+            text-align: center;
+            padding: 3rem 1rem;
+            border-bottom: 5px solid var(--color-secondary);
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        header p {
+            font-style: italic;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Estilos del Acordeón */
+        .accordion-item {
+            background-color: white;
+            border: 1px solid #ddd;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .accordion-header {
+            width: 100%;
+            padding: 1.2rem 1.5rem;
+            background-color: white;
+            border: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--color-primary);
+            transition: background-color 0.3s ease;
+        }
+
+        .accordion-header:hover {
+            background-color: var(--color-accent);
+            color: white;
+        }
+
+        .accordion-header.active {
+            background-color: var(--color-secondary);
+            color: white;
+        }
+
+        .icon {
+            transition: transform 0.3s ease;
+            font-size: 1.5rem;
+        }
+
+        .accordion-header.active .icon {
+            transform: rotate(180deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out, padding 0.3s ease;
+            background-color: #fff;
+        }
+
+        .content-inner {
+            padding: 1.5rem;
+            border-top: 1px solid #eee;
+        }
+
+        .content-inner p {
+            margin-bottom: 1.2rem;
+        }
+
+        .content-inner h3 {
+            color: var(--color-secondary);
+            margin: 1.5rem 0 1rem 0;
+            border-left: 4px solid var(--color-primary);
+            padding-left: 10px;
+        }
+
+        .content-inner ul {
+            margin-left: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .content-inner li {
+            margin-bottom: 0.8rem;
+        }
+
+        .reference-list {
+            list-style: none;
+            margin-left: 0 !important;
+        }
+
+        .reference-list li {
+            font-size: 0.9rem;
+            padding-left: 1.5rem;
+            text-indent: -1.5rem;
+            color: var(--color-dark);
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--color-neutral);
+            font-size: 0.9rem;
+            margin-top: 3rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.8rem; }
+            .accordion-header { font-size: 1rem; padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Historia y Cultura Maya</h1>
+    <p>Legado, sabiduría y resistencia de una civilización milenaria</p>
+</header>
+
+<div class="container">
+    
+    <!-- Orígenes -->
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>Orígenes y período formativo (2000 a.C. – 250 d.C.)</span>
+            <span class="icon">▾</span>
+        </button>
+        <div class="accordion-content">
+            <div class="content-inner">
+                <p>La civilización maya hunde sus raíces en las costas del Pacífico y las tierras bajas tropicales de Mesoamérica. Los primeros indicios de sedentarismo y agricultura datan de alrededor del 2000 a.C., cuando comunidades tempranas comenzaron a cultivar maíz (ixim), frijol, calabaza y chile, conformando la llamada "milpa".</p>
+                <p>Durante el Preclásico Tardío (400 a.C. – 250 d.C.) la complejidad política y arquitectónica aumentó de forma notable. Ciudades como Nakbé, El Mirador y Cival contaban con plataformas monumentales y sistemas de sacbéob (calzadas blancas). El Mirador albergó La Danta, la estructura piramidal más grande del mundo maya.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Período Clásico -->
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>Período clásico (250 – 900 d.C.)</span>
+            <span class="icon">▾</span>
+        </button>
+        <div class="accordion-content">
+            <div class="content-inner">
+                <p>Representa el apogeo político, artístico e intelectual. El territorio se organizó en ciudades-estado independientes como Tikal, Calakmul, Palenque y Copán. El poder residía en el <em>ajaw</em> (señor), figura semidivina que legitimaba su autoridad a través de rituales y genealogía.</p>
+                <h3>El Colapso Clásico</h3>
+                <p>Hacia finales del siglo VIII ocurrió el abandono de las grandes ciudades del sur. Causas: sequías prolongadas, superpoblación, agotamiento de suelos y conflictos bélicos intensificados.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Período Posclásico -->
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>Período posclásico (900 – 1521 d.C.)</span>
+            <span class="icon">▾</span>
+        </button>
+        <div class="accordion-content">
+            <div class="content-inner">
+                <p>El centro de gravedad se desplazó al norte. Chichén Itzá emergió como potencia con arquitectura híbrida (estilo Puuc e influencia tolteca). Más tarde, Mayapán se consolidó como capital hasta su caída en 1441.</p>
+                <p>En las tierras altas de Guatemala, reinos como el k'iche' y kaqchikel competían por el dominio. La conquista española comenzó en 1524, aunque la última ciudad independiente, Nojpetén, no cayó hasta 1697.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sistema de escritura -->
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>Sistema de escritura</span>
+            <span class="icon">▾</span>
+        </button>
+        <div class="accordion-content">
+            <div class="content-inner">
+                <p>Desarrollaron el único sistema de escritura plenamente funcional de Mesoamérica. Es logosílábico: combina logogramas con sílabas fonéticas. Se han identificado más de 800 signos.</p>
+                <h3>Códices supervivientes</h3>
+                <ul>
+                    <li>Códice de Dresde (astronomía)</li>
+                    <li>Códice de Madrid (rituales)</li>
+                    <li>Códice de París (profecías)</li>
+                    <li>Códice de Grolier (ciclos de Venus)</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Astronomía y calendarios -->
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>Astronomía y calendarios</span>
+            <span class="icon">▾</span>
+        </button>
+        <div class="accordion-content">
+            <div class="content-inner">
+                <p>Alcanzaron una precisión extraordinaria. Determinaron el año solar en 365.2420 días y calcularon el ciclo de Venus con un error mínimo.</p>
+                <h3>Ciclos temporales</h3>
+                <ul>
+                    <li><strong>Tzolk'in:</strong> Calendario ritual de 260 días.</li>
+                    <li><strong>Haab':</strong> Calendario civil de 365 días.</li>
+                    <li><strong>Cuenta Larga:</strong> Sistema para fechar eventos históricos desde una fecha mítica (3114 a.C.).</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Religión -->
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>Religión y cosmovisión</span>
+            <span class="icon">▾</span>
+        </button>
+        <div class="accordion-content">
+            <div class="content-inner">
+                <p>Concebían el cosmos en tres planos: el cielo (13 niveles), la tierra y el inframundo o <em>Xibalbá</em> (9 niveles). El tiempo era cíclico y sagrado.</p>
+                <p>Deidades principales: Itzamná (señor de los cielos), Chaak (lluvia), Ixchel (luna y medicina) y Kukulkán (serpiente emplumada). El juego de pelota recreaba mitos del Popol Vuh.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Arte y arquitectura -->
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>Arte y arquitectura</span>
+            <span class="icon">▾</span>
+        </button>
+        <div class="accordion-content">
+            <div class="content-inner">
+                <p>Destaca el dominio técnico en escultura (estelas), pintura (murales de Bonampak) y cerámica policromada. El jade era el material más valioso.</p>
+                <h3>Elementos Arquitectónicos</h3>
+                <p>Uso de la bóveda maya (falsa bóveda). Estilos regionales: Río Bec (torres), Chenes (fachadas zoomorfas) y Puuc (mosaicos de piedra).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Organización Social -->
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>Organización social y económica</span>
+            <span class="icon">▾</span>
+        </button>
+        <div class="accordion-content">
+            <div class="content-inner">
+                <p>Sociedad jerárquica: Ajaw (cúspide), nobleza (almehen), especialistas (escribas/artesanos) y campesinos tributarios.</p>
+                <p>Economía basada en el comercio de bienes de prestigio (sal, obsidiana, cacao, jade). Usaron técnicas agrícolas avanzadas como campos elevados y terrazas.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Los Mayas hoy -->
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>Los Mayas hoy</span>
+            <span class="icon">▾</span>
+        </button>
+        <div class="accordion-content">
+            <div class="content-inner">
+                <p>La civilización nunca desapareció. Hoy existen entre 7 y 8 millones de mayas. La familia lingüística comprende más de 30 lenguas vivas.</p>
+                <h3>Resistencia y Cultura Contemporánea</h3>
+                <p>Mantienen tradiciones como el Cha'a Chaak y el Hanal Pixan. Movimientos como el EZLN en México y figuras como Rigoberta Menchú en Guatemala han visibilizado la lucha por sus derechos y autonomía territorial.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Referencias -->
+    <div class="accordion-item">
+        <button class="accordion-header">
+            <span>Referencias</span>
+            <span class="icon">▾</span>
+        </button>
+        <div class="accordion-content">
+            <div class="content-inner">
+                <ul class="reference-list">
+                    <li>Coe, M. D. (2011). <em>The Maya</em> (8th ed.). Thames & Hudson.</li>
+                    <li>Demarest, A. A. (2004). <em>Ancient Maya: The Rise and Fall of a Rainforest Civilization</em>. Cambridge University Press.</li>
+                    <li>Houston, S., Mazariegos, O. C., & Stuart, D. (Eds.). (2001). <em>The Decipherment of Ancient Maya Writing</em>. University of Oklahoma Press.</li>
+                    <li>Instituto Nacional de Estadística y Geografía (INEGI). (2020). <em>Censo de Población y Vivienda 2020</em>. https://www.inegi.org.mx</li>
+                    <li>Instituto Nacional de Lenguas Indígenas (INALI). (2008). <em>Catálogo de las Lenguas Indígenas Nacionales</em>. https://www.inali.gob.mx</li>
+                    <li>Martin, S., & Grube, N. (2008). <em>Chronicle of the Maya Kings and Queens: Deciphering the Dynasties of the Ancient Maya</em> (2nd ed.). Thames & Hudson.</li>
+                    <li>McKillop, H. (2004). <em>The Ancient Maya: New Perspectives</em>. ABC-CLIO.</li>
+                    <li>Miller, M., & Taube, K. (1993). <em>The Gods and Symbols of Ancient Mexico and the Maya</em>. Thames & Hudson.</li>
+                    <li>Restall, M., & Asselbergs, F. (2007). <em>Invading Guatemala: Spanish, Nahua, and Maya Accounts of the Conquest Wars</em>. Penn State University Press.</li>
+                    <li>Sharer, R. J., & Traxler, L. P. (2006). <em>The Ancient Maya</em> (6th ed.). Stanford University Press.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<footer>
+    <p>Información adaptada de las fuentes referenciadas. MayApp &copy; 2026</p>
+</footer>
+
+<script>
+    // Lógica para los apartados desplegables
+    const headers = document.querySelectorAll('.accordion-header');
+
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const content = header.nextElementSibling;
+            const isOpen = header.classList.contains('active');
+
+            if (!isOpen) {
+                header.classList.add('active');
+                content.style.maxHeight = content.scrollHeight + "px";
+            } else {
+                header.classList.remove('active');
+                content.style.maxHeight = null;
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
